@@ -14,7 +14,10 @@ strawtubesDigi::strawtubesDigi() {
 strawtubesDigi::strawtubesDigi(TF1 *timeCoordinate_dependence) {
     mpvTime = 0;
     LandauSigma = 0;
+    newDist2Wire = 0;
+    f2 = 0;
     timeDependence = timeCoordinate_dependence;
+    rand = new TRandom3();
 }
 
 strawtubesDigi::~strawtubesDigi() { }
@@ -31,11 +34,7 @@ void strawtubesDigi::NewDist2WireCalculation(Double_t driftTime) {
 }
 
 void strawtubesDigi::default_NewDist2WireCalculation(Double_t driftTime) {
-//    Double_t p0 = timeDependence->GetParameter(0);
-//    Double_t p1 = timeDependence->GetParameter(1);
-//    newDist2Wire = TMath::Sqrt(TMath::Abs(driftTime - p0) / p1);
-
-    newDist2Wire = sqrt(abs(driftTime - 5.285) / 622.8);
+   newDist2Wire = sqrt(abs(driftTime - 5.285) / 622.8);
 }
 
 void strawtubesDigi::SetLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5) {

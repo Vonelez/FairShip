@@ -772,12 +772,14 @@ class ShipDigiReco:
 
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
-     TDC = aDigi.GetDigi()
+     aHit = ROOT.strawtubesHit(p,self.sTree.t0)
+     TDC = aHit.GetTDC()
      t0 = self.sTree.t0
      strawTime = p.GetTime()
      electronicsTime = (stop[0]-p.GetX()) / u.speedOfLight
      driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, strawTime, electronicsTime)
      smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
+     if smear > ShipGeo.strawtubes.InnerStrawDiameter/2.: aHit.setInvalid()
      if no_amb: smear = p.dist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
