@@ -25,7 +25,7 @@ strawtubesHit::strawtubesHit() : ShipHit()
 strawtubesHit::strawtubesHit(Int_t detID, Float_t tdc) : ShipHit(detID, tdc)
 {
     fDetectorID = detID;
-    fDigi = tdc;
+    fdigi = tdc;
     flag = true;
 }
 // -----   constructor from strawtubesPoint   ------------------------------------------

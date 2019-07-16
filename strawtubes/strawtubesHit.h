@@ -38,6 +38,7 @@ class strawtubesHit : public ShipHit
     strawtubesHit operator=(const strawtubesHit& point);
 
     Float_t flag;   ///< flag
+    Double_t driftTime;
 
     ClassDef(strawtubesHit,3);
     
