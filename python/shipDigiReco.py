@@ -784,7 +784,12 @@ class ShipDigiReco:
      signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
      wireOffset = ROOT.strawtubesDigi.Instance().GetWireOffset(detID)
      driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
-     if driftTime < 5.285: continue
+
+#  _______________________________________________________________
+#                                                                 |
+     if driftTime < 5.285: continue  # <--- It must be changed!!! |
+#  _______________________________________________________________|
+
      smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime, wireOffset)
 
      if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
