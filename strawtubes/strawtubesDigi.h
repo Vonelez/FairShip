@@ -3,7 +3,7 @@
 
 #include "TRandom.h"
 #include "TRandom3.h"
-#include "TF1.h"
+#include "TH1.h"
 #include "TGraph.h"
 #include "TMath.h"
 #include "TVector3.h"
@@ -26,8 +26,7 @@ class strawtubesDigi {
     Double_t DriftTimeFromDist2Wire(Double_t dist2Wire, bool inSmallerArea);
     Double_t NewDist2WireFromDriftTime(Double_t driftTime, Double_t wireOffset);
     Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
-   TGraph d2w_dtRelation(TH1 *TDChist);
-
+   TGraph* d2w_dtRelation(TH1F *TDChist);
 
    // to set the parameter of misalignment, different input refer to different case (uniform sagging or not)
     void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug); 
