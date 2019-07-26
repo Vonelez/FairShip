@@ -39,10 +39,6 @@ void strawtubesDigi::NewDist2WireCalculation(Double_t driftTime, Double_t wireOf
 }
 
 void strawtubesDigi::default_NewDist2WireCalculation(Double_t driftTime) {
-//    Double_t p0 = timeDependence->GetParameter(0);
-//    Double_t p1 = timeDependence->GetParameter(1);
-//    newDist2Wire = TMath::Sqrt(TMath::Abs(driftTime - p0) / p1);
-
     newDist2Wire = sqrt(abs(driftTime - 5.285) / 622.8);
 }
 
@@ -75,6 +71,23 @@ void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset) {
    Double_t aRightChain = -84.55 * wireOffset + 622.8;
    leftChain->SetParameter(0, aLeftChain);
    rightChain->SetParameter(0, aRightChain);
+}
+
+TGraph strawtubesDigi::d2w_dtRelation(TH1F *TDChist) {
+   TGraph *relation = new TGraph();
+   Int_t nBins = TDChist->GetNbinsX();
+   Double_t tubeRadius = 1.0;
+   Double_t wireRadius = 0.1;
+   Double_t sum = 0;
+   Double_t coordinate = 0;
+   for (int i = 0; i < nBins; ++i) {
+      for (int j = 0; j < i; ++j) {
+         sum += TDChist->GetBinContent(j);
+      }
+      coordinate = ( sum / TDChist->Integral() ) * (tubeRadius - wireRadius) + wireRadius;
+      relation->SetPoint(i, coordinate, TDChist->GetBinCenter(i));
+      sum = 0;
+   }
 }
 
 // For the Misalignment part
@@ -209,6 +222,6 @@ bool strawtubesDigi::InSmallerSection(TVector3 pPos, TVector3 start, TVector3 st
 }
 
 Double_t strawtubesDigi::GetWireOffset(Float_t ID) {
-   return GetMaxTubeSagging(ID) - GetMaxWireSagging(ID);
+   return TMath::Abs(GetMaxTubeSagging(ID) - GetMaxWireSagging(ID));
 }
 

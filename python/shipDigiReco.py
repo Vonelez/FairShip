@@ -785,10 +785,10 @@ class ShipDigiReco:
      wireOffset = ROOT.strawtubesDigi.Instance().GetWireOffset(detID)
      driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
 
-#  _______________________________________________________________
-#                                                                 |
-     if driftTime < 5.285: continue  # <--- It must be changed!!! |
-#  _______________________________________________________________|
+#  ________________________________________________________________________
+#                                                                          |
+     if driftTime < 5.285: driftTime = 5.285  # <--- It must be changed!!! |
+#  ________________________________________________________________________|
 
      smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime, wireOffset)
 
@@ -800,6 +800,7 @@ class ShipDigiReco:
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
      if aDigi.isValid():
+         h['TDC'].Fill(driftTime)
          h['vshape'].Fill(smear, driftTime)
          h['vshape_original'].Fill(p.dist2Wire(), driftTime)
          h['recoDist'].Fill(smear, p.dist2Wire())
@@ -807,6 +808,11 @@ class ShipDigiReco:
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
      if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)
+
+  from ROOT import TGraph
+  gr = TGraph()
+  gr = ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'])
+  gr.Print('graph.png')
 
   return SmearedHits
   

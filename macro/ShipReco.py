@@ -124,6 +124,7 @@ if withHists:
  ut.bookHist(h,'vshape','Drift Time vs distance to wire; Distance, cm; Time, ns',1000,0.,0.,10000,0.,0.)
  ut.bookHist(h,'vshape_original','Drift Time vs distance to wire; Distance, cm; Time, ns',1000,0.,0.,10000,0.,0.)
  ut.bookHist(h,'recoDist','Reco dist vs distance to wire; Reco Distance, cm; Distance to the wire, cm',250,0.,2.5,100,0.,1.)
+ ut.bookHist(h,'TDC','TDC',1000,0.,0.)
 
 import shipDet_conf
 run = ROOT.FairRunSim()
@@ -178,5 +179,5 @@ cv=h['dist'].cd(2)
 h['distu'].Draw()
 cv=h['dist'].cd(3)
 h['distv'].Draw()
-h['dist'].Print('dist2Wire.gif')
+# h['dist'].Print('dist2Wire.gif')
 SHiP.finish()
