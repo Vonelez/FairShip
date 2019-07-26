@@ -3,6 +3,7 @@
 
 #include "TRandom.h"
 #include "TRandom3.h"
+#include "TF1.h"
 #include "TH1.h"
 #include "TGraph.h"
 #include "TMath.h"
