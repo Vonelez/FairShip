@@ -790,7 +790,7 @@ class ShipDigiReco:
      if driftTime < 5.285: driftTime = 5.285  # <--- It must be changed!!! |
 #  ________________________________________________________________________|
 
-     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime, wireOffset)
+     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
 
      if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
