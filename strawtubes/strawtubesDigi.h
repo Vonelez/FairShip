@@ -28,7 +28,7 @@ public:
    Double_t DriftTimeFromDist2Wire(Double_t dist2Wire, bool inSmallerArea);
    Double_t NewDist2WireFromDriftTime(Double_t driftTime, Double_t wireOffset);
    Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
-   TGraph *d2w_dtRelation(TH1F TDChist);
+   TGraph *d2w_dtRelation(const TH1F* TDC);
 
    // to set the parameter of misalignment, different input refer to different case (uniform sagging or not)
    void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug);
@@ -63,10 +63,10 @@ private:
    TRandom3 *rand;
 
    void driftTimeCalculation(Double_t dist2Wire,
+                             Double_t wireOffset,
                              bool inSmallerArea); //! Calculates the drift time from input distance to the wire
 
-   void NewDist2WireCalculation(Double_t driftTime,
-                                Double_t wireOffset); //! Calculates distance to the wire after drift time smearing for
+   void NewDist2WireCalculation(Double_t driftTime); //! Calculates distance to the wire after drift time smearing for
                                                       //! the user time-coordinate dependence function
    void
    default_NewDist2WireCalculation(Double_t driftTime); //! Calculates distance to the wire after drift time smearing

@@ -30,15 +30,9 @@ void strawtubesDigi::driftTimeCalculation(Double_t dist2Wire, bool inSmallerArea
    driftTime = rand->Landau(mpvTime, LandauSigma);
 }
 
-void strawtubesDigi::NewDist2WireCalculation(Double_t driftTime, Double_t wireOffset)
+void strawtubesDigi::NewDist2WireCalculation(Double_t driftTime)
 {
-   parabolaChainsEstimation(wireOffset);
-   Double_t checkTime = rightChain->Eval(1.0 - wireOffset);
-   if (driftTime < checkTime) {
-      newDist2Wire = rightChain->GetX(driftTime, 0., 4.);
-   } else {
-      newDist2Wire = leftChain->GetX(driftTime, 0., 4.);
-   }
+
 }
 
 void strawtubesDigi::default_NewDist2WireCalculation(Double_t driftTime)
@@ -55,16 +49,17 @@ void strawtubesDigi::SetLandauParams(Double_t p1, Double_t p2, Double_t p3, Doub
    this->p5 = p5;
 }
 
-Double_t strawtubesDigi::DriftTimeFromDist2Wire(Double_t dist2Wire, bool inSmallerArea)
+Double_t strawtubesDigi::DriftTimeFromDist2Wire(Double_t dist2Wire, Double_t wireOffset, bool inSmallerArea)
 {
+   parabolaChainsEstimation(wireOffset);
    driftTimeCalculation(dist2Wire, inSmallerArea);
    return driftTime;
 }
 
-Double_t strawtubesDigi::NewDist2WireFromDriftTime(Double_t driftTime, Double_t wireOffset)
+Double_t strawtubesDigi::NewDist2WireFromDriftTime(Double_t driftTime)
 {
-   NewDist2WireCalculation(driftTime, wireOffset);
-   //    default_NewDist2WireCalculation(driftTime);
+//   NewDist2WireCalculation(driftTime, wireOffset);
+   default_NewDist2WireCalculation(driftTime);
    return newDist2Wire;
 }
 
@@ -75,26 +70,27 @@ Double_t strawtubesDigi::DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t si
 
 void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset)
 {
-   Double_t aLeftChain = 73.15 * wireOffset + 622.8;
-   Double_t aRightChain = -84.55 * wireOffset + 622.8;
+   Double_t aLeftChain = 83.11 * wireOffset + 622.8;
+   Double_t aRightChain = -83.11 * wireOffset + 622.8;
    leftChain->SetParameter(0, aLeftChain);
    rightChain->SetParameter(0, aRightChain);
 }
 
-TGraph *d2w_dtRelation(TH1F TDChist)
+TGraph *d2w_dtRelation(const TH1F* TDC)
 {
+   TH1F* TDChist = (TH1F*) TDC->Clone();
    TGraph *relation = new TGraph();
-   Int_t nBins = TDChist.GetNbinsX();
+   Int_t nBins = TDChist->GetNbinsX();
    Double_t tubeRadius = 1.0;
    Double_t wireRadius = 0.01;
    Double_t sum = 0;
    Double_t coordinate = 0;
    for (int i = 0; i < nBins; ++i) {
       for (int j = 0; j < i; ++j) {
-         sum += TDChist.GetBinContent(j);
+         sum += TDChist->GetBinContent(j);
       }
-      coordinate = (sum / TDChist.Integral()) * (tubeRadius - wireRadius) + wireRadius;
-      relation->SetPoint(i, coordinate, TDChist.GetBinCenter(i));
+      coordinate = (sum / TDChist->Integral()) * (tubeRadius - wireRadius) + wireRadius;
+      relation->SetPoint(i, coordinate, TDChist->GetBinCenter(i));
       sum = 0;
    }
    return relation;

@@ -809,7 +809,6 @@ class ShipDigiReco:
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
      if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)
 
-  from ROOT import TGraph
   gr = ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'])
   gr.Print('graph.png')
 

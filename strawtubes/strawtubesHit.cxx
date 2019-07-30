@@ -62,7 +62,8 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      if (flag)
      {
         bool inSmallArea = strawtubesDigi::Instance().InSmallerSection(pPos, start, stop, fDetectorID);
-        driftTime = strawtubesDigi::Instance().DriftTimeFromDist2Wire(dist2Wire, inSmallArea);
+        Double_t wireOffset = strawtubesDigi::Instance().GetWireOffset(fDetectorID);
+        driftTime = strawtubesDigi::Instance().DriftTimeFromDist2Wire(dist2Wire, wireOffset, inSmallArea);
         fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
      }
      else fdigi = -1;
