@@ -58,7 +58,7 @@ Double_t strawtubesDigi::DriftTimeFromDist2Wire(Double_t dist2Wire, Double_t wir
 
 Double_t strawtubesDigi::NewDist2WireFromDriftTime(Double_t driftTime)
 {
-//   NewDist2WireCalculation(driftTime, wireOffset);
+//   NewDist2WireCalculation(driftTime);
    default_NewDist2WireCalculation(driftTime);
    return newDist2Wire;
 }

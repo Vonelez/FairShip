@@ -63,7 +63,6 @@ private:
    TRandom3 *rand;
 
    void driftTimeCalculation(Double_t dist2Wire,
-                             Double_t wireOffset,
                              bool inSmallerArea); //! Calculates the drift time from input distance to the wire
 
    void NewDist2WireCalculation(Double_t driftTime); //! Calculates distance to the wire after drift time smearing for
