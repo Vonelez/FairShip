@@ -811,7 +811,7 @@ class ShipDigiReco:
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
      if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)
 
-  gr = ROOT.strawtubesDigi.Instance().d2w_dtRelation(hist_exp)
+  gr = ROOT.strawtubesDigi.Instance().d2w_dtRelation()
   gr.Print('graph.png')
 
   return SmearedHits
