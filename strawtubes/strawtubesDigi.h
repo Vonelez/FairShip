@@ -25,8 +25,8 @@ public:
     */
    void SetLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5);
 
-   Double_t DriftTimeFromDist2Wire(Double_t dist2Wire, bool inSmallerArea);
-   Double_t NewDist2WireFromDriftTime(Double_t driftTime, Double_t wireOffset);
+   Double_t DriftTimeFromDist2Wire(Double_t dist2Wire, Double_t wireOffset, bool inSmallerArea);
+   Double_t NewDist2WireFromDriftTime(Double_t driftTime);
    Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
    TGraph *d2w_dtRelation(const TH1F* TDC);
 
