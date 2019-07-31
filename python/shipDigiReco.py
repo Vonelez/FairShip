@@ -711,18 +711,26 @@ class ShipDigiReco:
 
  def setupDriftTimeHist(self):
  # setting up DriftTime histogram for the dist2wire = f(driftTime) relation estimation
-    self.digitizeStrawTubes()
-    for aMCPoint in self.sTree.strawtubesPoint:
-        self.sTree.t0 = self.random.Rndm()*1*u.microsecond
-        aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0)
-        if aHit.isValid():
-            TDC = aHit.GetTDC()
-            t0 = self.sTree.t0 + aMCPoint.GetTime()
-            signalPropagationTime = (stop[0]-aMCPoint.GetX()) / u.speedOfLight
-            driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
-            if driftTime < 5.285: driftTime = 5.285
-            if driftTime > 2000: continue
-            h['driftTime'].Fill(driftTime)
+  self.sTree.t0 = self.random.Rndm() * 1 * u.microsecond
+  self.digitizeStrawTubes()
+  key = -1
+  for aDigi in self.digiStraw:
+     key += 1
+     if not aDigi.isValid(): continue
+     detID = aDigi.GetDetectorID()
+     # don't use hits from straw veto
+     station = int(detID / 10000000)
+     if station > 4: continue
+
+     p = self.sTree.strawtubesPoint[key]
+
+     aHit = ROOT.strawtubesHit(p, self.sTree.t0)
+     TDC = aHit.GetTDC()
+     t0 = self.sTree.t0 + p.GetTime()
+     signalPropagationTime = (stop[0] - p.GetX()) / u.speedOfLight
+     driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
+     if driftTime < 5.285: driftTime = 5.285
+     h['driftTime'].Fill(driftTime)
 
  def digitizeStrawTubes(self):
  # digitize FairSHiP MC hits  
