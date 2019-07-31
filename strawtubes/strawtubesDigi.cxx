@@ -229,7 +229,7 @@ bool strawtubesDigi::InSmallerSection(TVector3 pPos, TVector3 start, TVector3 st
    Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), ID);
    if (wireShift <= tubeShift) // the wire is above the tube center, upper part is smaller part
    {
-      if (pPos.y() > wPos.y() - wireShift) {
+      if (pPos.y() > wPos.y() + wireShift) {
          return true;
       } else
          return false;
