@@ -76,7 +76,7 @@ void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset)
    rightChain->SetParameter(0, aRightChain);
 }
 
-void d2w_dtRelation(TGraph* graph)
+void d2w_dtRelation()
 {
 //   TH1D* TDChist = (TH1D*) TDC->Clone();
 //   Int_t nBins = TDChist->GetNbinsX();
@@ -92,7 +92,7 @@ void d2w_dtRelation(TGraph* graph)
 //      graph->SetPoint(i, coordinate, TDChist->GetBinCenter(i));
 //      sum = 0;
 //   }
-   graph->SetPoint(0, 10, 10);
+   std::cout << "I'm in d2w_dtRelation()" << std::endl;
 }
 
 // For the Misalignment part
