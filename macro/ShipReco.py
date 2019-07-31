@@ -173,7 +173,7 @@ ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['driftTime'], graph)
 graphOUT = TFile("graph.root", "RECREATE")
 graphOUT.cd()
 graph.Write()
-graphOUT.close()
+graphOUT.Close()
 
 for iEvent in range(firstEvent, nEvents):
  if iEvent%100 == 0 or debug: print 'event ',iEvent
