@@ -32,6 +32,7 @@ strawtubesHit::strawtubesHit(Int_t detID, Float_t tdc)
 strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
   : ShipHit()
 {
+     bool inSmallArea = false;
      TVector3 start = TVector3();
      TVector3 stop  = TVector3();
      fDetectorID = p->GetDetectorID();
@@ -61,12 +62,13 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
 
      if (flag)
      {
-        bool inSmallArea = strawtubesDigi::Instance().InSmallerSection(pPos, start, stop, fDetectorID);
+        inSmallArea = strawtubesDigi::Instance().InSmallerSection(pPos, start, stop, fDetectorID);
         Double_t wireOffset = strawtubesDigi::Instance().GetWireOffset(fDetectorID);
         driftTime = strawtubesDigi::Instance().DriftTimeFromDist2Wire(dist2Wire, wireOffset, inSmallArea);
         fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
      }
      else fdigi = -1;
+     std::cout << p->dist2Wire() << "  -  " << dist2Wire << "  -  " << inSmallArea << std::endl;
      strawtubesDigi::Instance().initialVShape->Fill(dist2Wire, driftTime);
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
