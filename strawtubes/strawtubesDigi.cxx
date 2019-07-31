@@ -76,22 +76,23 @@ void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset)
    rightChain->SetParameter(0, aRightChain);
 }
 
-void d2w_dtRelation(const TH1D* TDC, TGraph* graph)
+void d2w_dtRelation(TGraph* graph)
 {
-   TH1D* TDChist = (TH1D*) TDC->Clone();
-   Int_t nBins = TDChist->GetNbinsX();
-   Double_t tubeRadius = 1.0;
-   Double_t wireRadius = 0.01;
-   Double_t sum = 0;
-   Double_t coordinate = 0;
-   for (int i = 0; i < nBins; ++i) {
-      for (int j = 0; j < i; ++j) {
-         sum += TDChist->GetBinContent(j);
-      }
-      coordinate = (sum / TDChist->Integral()) * (tubeRadius - wireRadius) + wireRadius;
-      graph->SetPoint(i, coordinate, TDChist->GetBinCenter(i));
-      sum = 0;
-   }
+//   TH1D* TDChist = (TH1D*) TDC->Clone();
+//   Int_t nBins = TDChist->GetNbinsX();
+//   Double_t tubeRadius = 1.0;
+//   Double_t wireRadius = 0.01;
+//   Double_t sum = 0;
+//   Double_t coordinate = 0;
+//   for (int i = 0; i < nBins; ++i) {
+//      for (int j = 0; j < i; ++j) {
+//         sum += TDChist->GetBinContent(j);
+//      }
+//      coordinate = (sum / TDChist->Integral()) * (tubeRadius - wireRadius) + wireRadius;
+//      graph->SetPoint(i, coordinate, TDChist->GetBinCenter(i));
+//      sum = 0;
+//   }
+   graph->SetPoint(0, 10, 10);
 }
 
 // For the Misalignment part
