@@ -76,7 +76,7 @@ void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset)
    rightChain->SetParameter(0, aRightChain);
 }
 
-void d2w_dtRelation(const TH1D* TDC, TGraph* graph)
+void strawtubesDigi::d2w_dtRelation(const TH1D* TDC, TGraph* graph)
 {
    TH1D* TDChist = (TH1D*) TDC->Clone();
    Int_t nBins = TDChist->GetNbinsX();
