@@ -6,7 +6,7 @@ import rootUtils as ut
 from array import array
 import sys 
 from math import fabs
-from ROOT import TGraph
+from ROOT import TGraph, TH1D
 stop  = ROOT.TVector3()
 start = ROOT.TVector3()
 
