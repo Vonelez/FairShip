@@ -126,6 +126,7 @@ if withHists:
  ut.bookHist(h,'vshape_original','Drift Time vs distance to wire; Distance, cm; Time, ns',1000,0.,0.,10000,0.,0.)
  ut.bookHist(h,'recoDist','Reco dist vs distance to wire; Reco Distance, cm; Distance to the wire, cm',250,0.,2.5,100,0.,1.)
  ut.bookHist(h,'TDC','TDC',1000,0.,0.)
+ ut.bookHist(h,'driftTime','driftTime',1000,0.,0.)
 
 import shipDet_conf
 run = ROOT.FairRunSim()
@@ -166,6 +167,12 @@ SHiP = shipDigiReco.ShipDigiReco(outFile,fgeo)
 nEvents   = min(SHiP.sTree.GetEntries(),nEvents)
 # main loop
 for iEvent in range(firstEvent, nEvents):
+    SHiP.setupDriftTimeHist()
+graph = TGraph()
+ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['driftTime'], graph)
+graph.Write("graph.root")
+
+for iEvent in range(firstEvent, nEvents):
  if iEvent%100 == 0 or debug: print 'event ',iEvent
  rc    = SHiP.sTree.GetEvent(iEvent) 
  SHiP.digitize()
@@ -173,9 +180,7 @@ for iEvent in range(firstEvent, nEvents):
  # memory monitoring
  # mem_monitor() 
 # end loop over events
-graph = TGraph()
-ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'], graph)
-graph.Write("recohists.root")
+
 # ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
 # cv=h['dist'].cd(1)
 # h['disty'].Draw()

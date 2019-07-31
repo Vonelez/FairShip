@@ -708,6 +708,19 @@ class ShipDigiReco:
            v.push_back(x)
        self.digiSBT2MC.push_back(v)
        index=index+1
+
+ def setupDriftTimeHist(self):
+ # setting up DriftTime histogram for the dist2wire = f(driftTime) relation estimation
+    for aMCPoint in self.sTree.strawtubesPoint:
+        aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0)
+        if aHit.isValid():
+            TDC = aHit.GetTDC()
+            t0 = self.sTree.t0 + aMCPoint.GetTime()
+            signalPropagationTime = (stop[0]-aMCPoint.GetX()) / u.speedOfLight
+            driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
+            if driftTime < 5.285: driftTime = 5.285
+            h['driftTime'].Fill(driftTime)
+
  def digitizeStrawTubes(self):
  # digitize FairSHiP MC hits  
    from strawDigi_conf import StrawtubesMisalign as stm
@@ -783,7 +796,6 @@ class ShipDigiReco:
      TDC = aHit.GetTDC()
      t0 = self.sTree.t0 + p.GetTime()
      signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
-     wireOffset = ROOT.strawtubesDigi.Instance().GetWireOffset(detID)
      driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
 
 #  ________________________________________________________________________
@@ -801,7 +813,7 @@ class ShipDigiReco:
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
      if aDigi.isValid():
-         h['TDC'].Fill(driftTime)
+         h['TDC'].Fill(TDC)
          h['vshape'].Fill(smear, driftTime)
          h['vshape_original'].Fill(p.dist2Wire(), driftTime)
          h['recoDist'].Fill(smear, p.dist2Wire())
