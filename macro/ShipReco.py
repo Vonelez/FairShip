@@ -174,7 +174,7 @@ for iEvent in range(firstEvent, nEvents):
  # mem_monitor() 
 # end loop over events
 graph = TGraph()
-ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'], gr)
+ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'], graph)
 ut.bookCanvas(h,key='graph',title='graph',nx=1200,ny=600,cx=1,cy=1)
 cv=h['graph'].cd()
 graph.Draw()
