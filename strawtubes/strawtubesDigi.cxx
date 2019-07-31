@@ -93,10 +93,10 @@ void strawtubesDigi::d2w_dtRelation(const TH1D* TDC, TGraph* graph)
    tdcFunc->SetParLimits(2,0,100);
    tdcFunc->SetParameter(3,175);
    tdcFunc->SetParLimits(3,0,1100);
-   tdcFunc->SetParameter(4,230);
-   tdcFunc->SetParLimits(4,0,1000);
-   tdcFunc->SetParameter(5,900);
-   tdcFunc->SetParLimits(5,0, 1300);
+   tdcFunc->SetParameter(4,0);
+   tdcFunc->SetParLimits(4,0,100);
+   tdcFunc->SetParameter(5,600);
+   tdcFunc->SetParLimits(5,500, 900);
    tdcFunc->SetParameter(6,0);
    tdcFunc->SetParLimits(6,0,2);
    tdcFunc->SetParameter(7,15);
