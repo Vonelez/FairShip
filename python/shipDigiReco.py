@@ -6,6 +6,7 @@ import rootUtils as ut
 from array import array
 import sys 
 from math import fabs
+from ROOT import TGraph
 stop  = ROOT.TVector3()
 start = ROOT.TVector3()
 
@@ -202,6 +203,9 @@ class ShipDigiReco:
 
  def reconstruct(self):
    ntracks = self.findTracks()
+   gr = TGraph()
+   ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'], gr)
+   gr.Print('gr.png')
    nGoodTracks = self.findGoodTracks()
    self.linkVetoOnTracks()
    for x in self.caloTasks: 
@@ -242,6 +246,7 @@ class ShipDigiReco:
     self.digitizeSplitcal()
     self.digiSplitcalBranch.Fill()
     self.recoSplitcalBranch.Fill()
+
 
  def digitizeSplitcal(self):  
    listOfDetID = {} # the idea is to keep only one hit for each cell/strip and if more points fall in the same cell/strip just sum up the energy
@@ -764,7 +769,6 @@ class ShipDigiReco:
   v_drift = modules["Strawtubes"].StrawVdrift()
   modules["Strawtubes"].StrawEndPoints(10002001,start,stop)
   z1 = stop.z()
-  hist_exp = ROOT.TH1D('hist_exp', 'hist_exp', 10000, 0, 0)
   for aDigi in self.digiStraw:
      key+=1
      if not aDigi.isValid(): continue
@@ -801,8 +805,7 @@ class ShipDigiReco:
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
      if aDigi.isValid():
-         # h['TDC'].Fill(driftTime)
-         hist_exp.Fill(driftTime)
+         h['TDC'].Fill(driftTime)
          h['vshape'].Fill(smear, driftTime)
          h['vshape_original'].Fill(p.dist2Wire(), driftTime)
          h['recoDist'].Fill(smear, p.dist2Wire())
@@ -810,9 +813,6 @@ class ShipDigiReco:
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
      if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)
-
-  gr = ROOT.strawtubesDigi.Instance().d2w_dtRelation(hist_exp)
-  gr.Print('graph.png')
 
   return SmearedHits
   

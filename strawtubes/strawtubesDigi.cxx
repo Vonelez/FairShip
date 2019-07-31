@@ -76,10 +76,9 @@ void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset)
    rightChain->SetParameter(0, aRightChain);
 }
 
-TGraph d2w_dtRelation(const TH1D* TDC)
+void d2w_dtRelation(const TH1D* TDC, TGraph* graph)
 {
    TH1D* TDChist = (TH1D*) TDC->Clone();
-   TGraph *relation = new TGraph();
    Int_t nBins = TDChist->GetNbinsX();
    Double_t tubeRadius = 1.0;
    Double_t wireRadius = 0.01;
@@ -90,11 +89,9 @@ TGraph d2w_dtRelation(const TH1D* TDC)
          sum += TDChist->GetBinContent(j);
       }
       coordinate = (sum / TDChist->Integral()) * (tubeRadius - wireRadius) + wireRadius;
-      relation->SetPoint(i, coordinate, TDChist->GetBinCenter(i));
+      graph->SetPoint(i, coordinate, TDChist->GetBinCenter(i));
       sum = 0;
    }
-
-   return *relation;
 }
 
 // For the Misalignment part
