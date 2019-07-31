@@ -204,7 +204,7 @@ class ShipDigiReco:
  def reconstruct(self):
    ntracks = self.findTracks()
    gr = TGraph()
-   ROOT.strawtubesDigi.Instance().d2w_dtRelation(gr)
+   ROOT.strawtubesDigi.Instance().d2w_dtRelation()
    gr.Print('gr.png')
    nGoodTracks = self.findGoodTracks()
    self.linkVetoOnTracks()
