@@ -32,7 +32,7 @@ import __builtin__ as builtin
 import rootUtils as ut
 import shipunit as u
 import shipRoot_conf
-from ROOT import TGraph
+from ROOT import TGraph, TFile
 
 shipRoot_conf.configure()
 
@@ -170,7 +170,10 @@ for iEvent in range(firstEvent, nEvents):
     SHiP.setupDriftTimeHist()
 graph = TGraph()
 ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['driftTime'], graph)
-graph.Write("graph.root")
+graphOUT = TFile("graph.root", "RECREATE")
+graphOUT.cd()
+graph.Write()
+graphOUT.close()
 
 for iEvent in range(firstEvent, nEvents):
  if iEvent%100 == 0 or debug: print 'event ',iEvent

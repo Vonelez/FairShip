@@ -720,6 +720,7 @@ class ShipDigiReco:
             signalPropagationTime = (stop[0]-aMCPoint.GetX()) / u.speedOfLight
             driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
             if driftTime < 5.285: driftTime = 5.285
+            if driftTime >2000: continue
             h['driftTime'].Fill(driftTime)
 
  def digitizeStrawTubes(self):
