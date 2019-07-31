@@ -711,8 +711,9 @@ class ShipDigiReco:
 
  def setupDriftTimeHist(self):
  # setting up DriftTime histogram for the dist2wire = f(driftTime) relation estimation
+    t0 = self.random.Rndm()*1*u.microsecond
     for aMCPoint in self.sTree.strawtubesPoint:
-        aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0)
+        aHit = ROOT.strawtubesHit(aMCPoint, t0)
         if aHit.isValid():
             TDC = aHit.GetTDC()
             t0 = self.sTree.t0 + aMCPoint.GetTime()
