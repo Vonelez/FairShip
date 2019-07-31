@@ -84,6 +84,24 @@ void strawtubesDigi::d2w_dtRelation(const TH1D* TDC, TGraph* graph)
    Double_t wireRadius = 0.01;
    Double_t sum = 0;
    Double_t coordinate = 0;
+   TF1 *tdcFunc = new TF1("tdcFunc", "[0] + ( [1] * (1 + [2] * exp( ([4] - x) / [3]) ) ) / ( (1 + exp( ([4] - x) / [6]) ) * (1 + exp( (x - [5]) / [7]) ) )", 0, 1500);
+   tdcFunc->SetParameter(0,2);
+   tdcFunc->SetParLimits(0,0,5);
+   tdcFunc->SetParameter(1,7500);
+   tdcFunc->SetParLimits(1,0,30000);
+   tdcFunc->SetParameter(2,8);
+   tdcFunc->SetParLimits(2,0,100);
+   tdcFunc->SetParameter(3,175);
+   tdcFunc->SetParLimits(3,0,1100);
+   tdcFunc->SetParameter(4,230);
+   tdcFunc->SetParLimits(4,0,1000);
+   tdcFunc->SetParameter(5,900);
+   tdcFunc->SetParLimits(5,0, 1300);
+   tdcFunc->SetParameter(6,0);
+   tdcFunc->SetParLimits(6,0,2);
+   tdcFunc->SetParameter(7,15);
+   tdcFunc->SetParLimits(7,0,100);
+   TDChist->Fit("tdcFunc");
    for (int i = 0; i < nBins; ++i) {
       for (int j = 0; j < i; ++j) {
          sum += TDChist->GetBinContent(j);

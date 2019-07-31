@@ -175,10 +175,7 @@ for iEvent in range(firstEvent, nEvents):
 # end loop over events
 graph = TGraph()
 ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'], graph)
-ut.bookCanvas(h,key='graph',title='graph',nx=1200,ny=600,cx=1,cy=1)
-cv=h['graph'].cd()
-graph.Draw()
-h['graph'].Print('graph.png')
+h.append(graph)
 # ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
 # cv=h['dist'].cd(1)
 # h['disty'].Draw()
