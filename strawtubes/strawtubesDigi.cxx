@@ -79,7 +79,6 @@ void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset)
 void strawtubesDigi::d2w_dtRelation(const TH1D* TDC, TGraph* graph)
 {
    TH1D* TDChist = (TH1D*) TDC->Clone();
-   Int_t nBins = TDChist->GetNbinsX();
    Double_t tubeRadius = 1.0;
    Double_t wireRadius = 0.01;
    Double_t sum = 0;
@@ -102,7 +101,10 @@ void strawtubesDigi::d2w_dtRelation(const TH1D* TDC, TGraph* graph)
    tdcFunc->SetParameter(7,15);
    tdcFunc->SetParLimits(7,0,100);
    TDChist->Fit("tdcFunc");
-   for (int i = 0; i < nBins; ++i) {
+   Double_t maxT = tdcFunc->GetParameter(5);
+   TAxis *xaxis = TDChist->GetXaxis();
+   Int_t maxBinT = xaxis->FindBin(maxT);
+   for (int i = 0; i < maxBinT; ++i) {
       for (int j = 0; j < i; ++j) {
          sum += TDChist->GetBinContent(j);
       }

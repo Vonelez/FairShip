@@ -175,7 +175,7 @@ for iEvent in range(firstEvent, nEvents):
 # end loop over events
 graph = TGraph()
 ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'], graph)
-ut.writeHists(graph, "recohists.root")
+graph.Write("recohists.root")
 # ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
 # cv=h['dist'].cd(1)
 # h['disty'].Draw()
