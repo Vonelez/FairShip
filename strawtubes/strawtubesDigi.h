@@ -5,6 +5,7 @@
 #include "TRandom3.h"
 #include "TF1.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TGraph.h"
 #include "TMath.h"
 #include "TVector3.h"
