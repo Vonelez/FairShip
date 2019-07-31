@@ -714,6 +714,7 @@ class ShipDigiReco:
   self.sTree.t0 = self.random.Rndm()*1*u.microsecond
   self.digiStraw.Delete()
   self.digitizeStrawTubes()
+  self.digiStrawBranch.Fill()
   key = -1
   for aDigi in self.digiStraw:
      key += 1
