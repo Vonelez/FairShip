@@ -32,6 +32,7 @@ import __builtin__ as builtin
 import rootUtils as ut
 import shipunit as u
 import shipRoot_conf
+from ROOT import TGraph
 
 shipRoot_conf.configure()
 
@@ -172,12 +173,18 @@ for iEvent in range(firstEvent, nEvents):
  # memory monitoring
  # mem_monitor() 
 # end loop over events
-ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
-cv=h['dist'].cd(1)
-h['disty'].Draw()
-cv=h['dist'].cd(2)
-h['distu'].Draw()
-cv=h['dist'].cd(3)
+graph = TGraph()
+ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'], gr)
+ut.bookCanvas(h,key='graph',title='graph',nx=1200,ny=600,cx=1,cy=1)
+cv=h['graph'].cd()
+graph.Draw()
+h['graph'].Print('graph.png')
+# ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
+# cv=h['dist'].cd(1)
+# h['disty'].Draw()
+# cv=h['dist'].cd(2)
+# h['distu'].Draw()
+# cv=h['dist'].cd(3)
 # h['distv'].Draw()
 # h['dist'].Print('dist2Wire.gif')
 SHiP.finish()

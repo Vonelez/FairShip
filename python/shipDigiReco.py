@@ -6,7 +6,6 @@ import rootUtils as ut
 from array import array
 import sys 
 from math import fabs
-from ROOT import TGraph, TH1D
 stop  = ROOT.TVector3()
 start = ROOT.TVector3()
 
@@ -203,9 +202,6 @@ class ShipDigiReco:
 
  def reconstruct(self):
    ntracks = self.findTracks()
-   gr = TGraph()
-   ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['TDC'], gr)
-   gr.Print('gr.png')
    nGoodTracks = self.findGoodTracks()
    self.linkVetoOnTracks()
    for x in self.caloTasks: 
