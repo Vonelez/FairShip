@@ -828,7 +828,7 @@ class ShipDigiReco:
      if aDigi.isValid():
          h['TDC'].Fill(driftTime)
          h['vshape'].Fill(smear, driftTime)
-         h['vshape_original'].Fill(p.dist2Wire(), driftTime)
+         # h['vshape_original'].Fill(p.dist2Wire(), driftTime)
          h['recoDist'].Fill(smear, p.dist2Wire())
 
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)

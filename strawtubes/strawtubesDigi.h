@@ -40,6 +40,7 @@ public:
    bool IsMisalign() { return misalign; }
 
    Double_t GetWireOffset(Float_t ID);
+   TH2D *initialVShape = new TH2D("initialVShape", "initialVShape", 120, 0., 1.2, 1500, 0, 1500);
 
 private:
    strawtubesDigi();

@@ -67,6 +67,7 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
         fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
      }
      else fdigi = -1;
+     strawtubesDigi::Instance().initialVShape->Fill(dist2Wire, driftTime);
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
 {

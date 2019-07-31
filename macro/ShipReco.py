@@ -165,16 +165,16 @@ import shipDigiReco
 
 SHiP = shipDigiReco.ShipDigiReco(outFile,fgeo)
 nEvents   = min(SHiP.sTree.GetEntries(),nEvents)
-# main loop
-for iEvent in range(firstEvent, nEvents):
-    SHiP.setupDriftTimeHist()
-graph = TGraph()
-ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['driftTime'], graph)
-graphOUT = TFile("graph.root", "RECREATE")
-graphOUT.cd()
-graph.Write()
-graphOUT.Close()
 
+# for iEvent in range(firstEvent, nEvents):
+#     SHiP.setupDriftTimeHist()
+# graph = TGraph()
+# ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['driftTime'], graph)
+# graphOUT = TFile("graph.root", "RECREATE")
+# graphOUT.cd()
+# graph.Write()
+# graphOUT.Close()
+# main loop
 for iEvent in range(firstEvent, nEvents):
  if iEvent%100 == 0 or debug: print 'event ',iEvent
  rc    = SHiP.sTree.GetEvent(iEvent) 
@@ -183,7 +183,7 @@ for iEvent in range(firstEvent, nEvents):
  # memory monitoring
  # mem_monitor() 
 # end loop over events
-
+h['vshape_original'] = ROOT.strawtubesDigi.Instance().initialVShape.Clone()
 # ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
 # cv=h['dist'].cd(1)
 # h['disty'].Draw()
