@@ -28,8 +28,7 @@ public:
    Double_t DriftTimeFromDist2Wire(Double_t dist2Wire, Double_t wireOffset, bool inSmallerArea);
    Double_t NewDist2WireFromDriftTime(Double_t driftTime);
    Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
-//   void d2w_dtRelation(const TH1D* TDC, TGraph* graph);
-   void d2w_dtRelation();
+   void d2w_dtRelation(const TH1D* TDC, TGraph* graph);
 
    // to set the parameter of misalignment, different input refer to different case (uniform sagging or not)
    void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug);
