@@ -167,7 +167,6 @@ SHiP = shipDigiReco.ShipDigiReco(outFile,fgeo)
 nEvents   = min(SHiP.sTree.GetEntries(),nEvents)
 # main loop
 for iEvent in range(firstEvent, nEvents):
-    SHiP.digitize()
     SHiP.setupDriftTimeHist()
 graph = TGraph()
 ROOT.strawtubesDigi.Instance().d2w_dtRelation(h['driftTime'], graph)

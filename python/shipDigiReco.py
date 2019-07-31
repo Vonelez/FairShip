@@ -711,6 +711,9 @@ class ShipDigiReco:
 
  def setupDriftTimeHist(self):
  # setting up DriftTime histogram for the dist2wire = f(driftTime) relation estimation
+  self.sTree.t0 = self.random.Rndm()*1*u.microsecond
+  self.digiStraw.Delete()
+  self.digitizeStrawTubes()
   key = -1
   for aDigi in self.digiStraw:
      key += 1
