@@ -127,6 +127,7 @@ if withHists:
  ut.bookHist(h,'recoDist','Reco dist vs distance to wire; Reco Distance, cm; Distance to the wire, cm',250,0.,2.5,100,0.,1.)
  ut.bookHist(h,'TDC','TDC',1000,0.,0.)
  ut.bookHist(h,'driftTime','driftTime',500,0.,1500)
+ ut.bookHist(h,'residuals','residuals',2000,-1,1)
 
 import shipDet_conf
 run = ROOT.FairRunSim()
@@ -184,6 +185,7 @@ for iEvent in range(firstEvent, nEvents):
  # mem_monitor() 
 # end loop over events
 h['vshape_original'] = ROOT.strawtubesDigi.Instance().initialVShape.Clone()
+h['residuals'] = ROOT.strawtubesDigi.Instance().residualsInStraw.Clone()
 print ROOT.strawtubesDigi.Instance().counter
 # ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
 # cv=h['dist'].cd(1)
