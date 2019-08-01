@@ -42,7 +42,7 @@ public:
 
    Double_t GetWireOffset(Float_t ID);
    TH2D *initialVShape = new TH2D("initialVShape", "initialVShape", 1200, 0., 1.2, 1500, 0, 1500);
-   TH1D *residualsInStraw = new TH1D("resid", "resid", 2000, -1, 1);
+   TH1D *residualsInStraw = new TH1D("resid", "resid", 5000, -0.1, 0.1);
    Int_t counter = 0;
 
 private:
