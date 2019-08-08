@@ -16,7 +16,11 @@ strawtubesDigi::strawtubesDigi()
    rand = new TRandom3();
 }
 
-strawtubesDigi::~strawtubesDigi() {}
+strawtubesDigi::~strawtubesDigi() {
+   delete timeDependence;
+   delete leftChain;
+   delete rightChain;
+}
 
 void strawtubesDigi::driftTimeCalculation(Double_t dist2Wire, bool inSmallerArea)
 {
@@ -112,6 +116,7 @@ void strawtubesDigi::d2w_dtRelation(const TH1D* TDC, TGraph* graph)
       graph->SetPoint(i, coordinate, TDChist->GetBinCenter(i));
       sum = 0;
    }
+   delete tdcFunc;
 }
 
 // For the Misalignment part
@@ -128,8 +133,7 @@ void strawtubesDigi::InitializeMisalign(Double_t tubeSag, Double_t wireSag, Doub
    }
 }
 
-void strawtubesDigi::InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean,
-                                        Double_t r, bool inDebug)
+void strawtubesDigi::InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug)
 {
    if (not(beingInit)) {
       maxTubeSagging = tubeMean;
@@ -230,7 +234,7 @@ bool strawtubesDigi::InSmallerSection(TVector3 pPos, TVector3 start, TVector3 st
    residualsInStraw->Fill(wPos.z() - pPos.z());
    if (wireShift <= tubeShift) // the wire is above the tube center, upper part is smaller part
    {
-      if (pPos.y() > wPos.y() + wireShift) {
+      if (pPos.y() > wPos.y() - wireShift) {
          return true;
       } else
          return false;

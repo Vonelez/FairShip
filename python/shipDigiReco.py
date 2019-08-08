@@ -784,6 +784,21 @@ class ShipDigiReco:
     s['dist'] = (s['dist'] -delt1 -t0)*v_drift 
   return SmearedHits
 
+ def pseudoCollectionEstimation(self):
+  pseudoCollection = []
+  key = -1
+  modules["Strawtubes"].StrawEndPoints(10002001,start,stop)
+  for aDigi in self.digiStraw:
+      key+=1
+      if not aDigi.isValid(): continue
+      detID = aDigi.GetDetectorID()
+      # don't use hits from straw veto
+      station = int(detID/10000000)
+      if station > 4 : continue
+      modules["Strawtubes"].StrawEndPoints(detID,start,stop)
+      pseudoCollection.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(), 'detID':detID} )
+  return pseudoCollection
+
  def smearHits(self,no_amb=None):
  # smear strawtube points
   SmearedHits = []
@@ -850,13 +865,13 @@ class ShipDigiReco:
   if withT0:  self.SmearedHits = self.withT0Estimate()
   # old procedure, not including estimation of t0 
   else:       self.SmearedHits = self.smearHits(withNoStrawSmearing)
-
+  pseudoCollection = self.pseudoCollectionEstimation()
   nTrack = -1
   trackCandidates = []
   
   if realPR:
     # Do real PatRec
-    track_hits = shipPatRec.execute(self.SmearedHits, ShipGeo, realPR)
+    track_hits = shipPatRec.execute(pseudoCollection, ShipGeo, realPR)
     # Create hitPosLists for track fit
     for i_track in track_hits.keys():
       atrack = track_hits[i_track]
