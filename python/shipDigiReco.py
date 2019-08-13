@@ -880,6 +880,9 @@ class ShipDigiReco:
       atrack_y34 = atrack['y34']
       atrack_stereo34 = atrack['stereo34']
       atrack_smeared_hits = list(atrack_y12) + list(atrack_stereo12) + list(atrack_y34) + list(atrack_stereo34)
+
+      counter = 0
+
       for sm in atrack_smeared_hits:
         detID = sm['detID']
         station = int(detID/10000000)
@@ -889,15 +892,13 @@ class ShipDigiReco:
           hitPosLists[trID] = ROOT.std.vector('TVectorD')()
           listOfIndices[trID] = []
           stationCrossed[trID]  = {}
-        m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],sm['dist']])
-
-        print sm['dist']
-
+        m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.SmearedHits[counter]['dist']])
         hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
         listOfIndices[trID].append(sm['digiHit'])
         if not stationCrossed[trID].has_key(station):
           stationCrossed[trID][station] = 0
         stationCrossed[trID][station] += 1
+        counter += 1
   else: # do fake pattern recognition
    for sm in self.SmearedHits:
     detID = self.digiStraw[sm['digiHit']].GetDetectorID()
@@ -905,7 +906,7 @@ class ShipDigiReco:
     trID = self.sTree.strawtubesPoint[sm['digiHit']].GetTrackID()
     if not hitPosLists.has_key(trID):   
       hitPosLists[trID]     = ROOT.std.vector('TVectorD')()
-      listOfIndices[trID] = [] 
+      listOfIndices[trID] = []
       stationCrossed[trID]  = {}
     m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],sm['dist']])
     hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
