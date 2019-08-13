@@ -906,6 +906,9 @@ class ShipDigiReco:
       stationCrossed[trID]  = {}
     m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],sm['dist']])
     hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
+
+    print sm['dist']
+
     listOfIndices[trID].append(sm['digiHit'])
     if not stationCrossed[trID].has_key(station): stationCrossed[trID][station]=0
     stationCrossed[trID][station]+=1
