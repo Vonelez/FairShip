@@ -243,7 +243,6 @@ class ShipDigiReco:
     self.digiSplitcalBranch.Fill()
     self.recoSplitcalBranch.Fill()
 
-
  def digitizeSplitcal(self):  
    listOfDetID = {} # the idea is to keep only one hit for each cell/strip and if more points fall in the same cell/strip just sum up the energy
    index = 0
@@ -708,40 +707,28 @@ class ShipDigiReco:
            v.push_back(x)
        self.digiSBT2MC.push_back(v)
        index=index+1
-
- def setupDriftTimeHist(self):
- # setting up DriftTime histogram for the dist2wire = f(driftTime) relation estimation
-  self.sTree.t0 = self.random.Rndm()*1*u.microsecond
-  self.digiStraw.Delete()
-  self.digitizeStrawTubes()
-  self.digiStrawBranch.Fill()
-  key = -1
-  for aDigi in self.digiStraw:
-     key += 1
-     if not aDigi.isValid(): continue
-     detID = aDigi.GetDetectorID()
-     # don't use hits from straw veto
-     station = int(detID / 10000000)
-     if station > 4: continue
-
-     p = self.sTree.strawtubesPoint[key]
-
-     aHit = ROOT.strawtubesHit(p, self.sTree.t0)
-     TDC = aHit.GetTDC()
-     t0 = self.sTree.t0 + p.GetTime()
-     signalPropagationTime = (stop[0] - p.GetX()) / u.speedOfLight
-     driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
-     if driftTime < 5.285: driftTime = 5.285
-     h['driftTime'].Fill(driftTime)
-
  def digitizeStrawTubes(self):
- # digitize FairSHiP MC hits  
+ # digitize FairSHiP MC hits
+   # from strawDigi_conf to initialize the part of module of misalignment
    from strawDigi_conf import StrawtubesMisalign as stm
-   if stm.misalign:
-     if stm.sameSagging:
-       ROOT.strawtubesDigi.Instance().InitializeMisalign(stm.maxTubeSagging,stm.maxWireSagging,ShipGeo.strawtubes.InnerStrawDiameter/2.,stm.debug);
+   from strawDigi_conf import DriftTimeCalculate as dtc
+
+   # turn on Drift time part or not, or using default setting
+   ROOT.strawtubesDigi.Instance().UseDefaultDriftTime(dtc.defaultDriftTime)
+
+   # misalign part
+   beingInit = ROOT.strawtubesDigi.Instance().IsInitialized()
+   if (stm.misalign and (not beingInit)):
+     ROOT.strawtubesDigi.Instance().PassRadius(ShipGeo.strawtubes.InnerStrawDiameter/2.)
+     ROOT.strawtubesDigi.Instance().SetDebug(stm.debug)
+     if stm.randType == "None":
+       ROOT.strawtubesDigi.Instance().SetSameSagging(stm.maxTubeSagging, stm.maxWireSagging)
+     elif stm.randType == "Gaus":
+       ROOT.strawtubesDigi.Instance().SetGausSagging(stm.maxTubeSagging, stm.tubeGausSigma, stm.maxWireSagging, stm.wireGausSigma)
+     elif stm.randType == "Unif":
+       ROOT.strawtubesDigi.Instance().SetUnifSagging(stm.maxTubeSagging, stm.tubeUnifDelta, stm.maxWireSagging, stm.wireUnifDelta)
      else:
-       ROOT.strawtubesDigi.Instance().InitializeMisalign(stm.maxTubeSagging,stm.tubeGausSigma,stm.maxWireSagging,stm.wireGausSigma,ShipGeo.strawtubes.InnerStrawDiameter/2.,stm.debug);
+       print "Not a proper type of distribution for strawtube sagging"
    index = 0
    hitsPerDetId = {}
    for aMCPoint in self.sTree.strawtubesPoint:
@@ -820,20 +807,23 @@ class ShipDigiReco:
 
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
-     aHit = ROOT.strawtubesHit(p,self.sTree.t0)
+     if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):
+         smear = (aDigi.GetDigi() - self.sTree.t0  - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight) * v_drift
+     else:
+         aHit = ROOT.strawtubesHit(p,self.sTree.t0)
      TDC = aHit.GetTDC()
      t0 = self.sTree.t0 + p.GetTime()
      signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
      driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
 
-#  ________________________________________________________________________
-#                                                                          |
+     #  ________________________________________________________________________
+     #                                                                          |
      if driftTime < 5.285: driftTime = 5.285  # <--- It must be changed!!! |
-#  ________________________________________________________________________|
+     #  ________________________________________________________________________|
 
-     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
+     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime
 
-     if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+         if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
      if no_amb: smear = p.dist2Wire()
 
@@ -846,6 +836,7 @@ class ShipDigiReco:
          # h['vshape_original'].Fill(p.dist2Wire(), driftTime)
          h['recoDist'].Fill(smear, p.dist2Wire())
 
+     # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
      if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)
