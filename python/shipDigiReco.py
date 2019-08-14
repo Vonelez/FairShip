@@ -823,7 +823,7 @@ class ShipDigiReco:
 
      smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime
 
-         if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+     if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
      if no_amb: smear = p.dist2Wire()
 
