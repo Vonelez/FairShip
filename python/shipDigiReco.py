@@ -808,20 +808,14 @@ class ShipDigiReco:
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
      if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):
-         smear = (aDigi.GetDigi() - self.sTree.t0  - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight) * v_drift
+         smear = (aDigi.GetDigi() - self.sTree.t0 - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight) * v_drift
      else:
-         aHit = ROOT.strawtubesHit(p,self.sTree.t0)
-     TDC = aHit.GetTDC()
-     t0 = self.sTree.t0 + p.GetTime()
-     signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
-     driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
-
-     #  ________________________________________________________________________
-     #                                                                          |
-     if driftTime < 5.285: driftTime = 5.285  # <--- It must be changed!!! |
-     #  ________________________________________________________________________|
-
-     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
+         TDC = aDigi.GetDigi()
+         t0 = self.sTree.t0 + p.GetTime()
+         signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
+         driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
+         if driftTime < 5.285: driftTime = 5.285
+         smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
 
      if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
