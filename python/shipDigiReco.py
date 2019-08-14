@@ -888,7 +888,12 @@ class ShipDigiReco:
         stationCrossed[trID][station] += 1
         counter += 1
   else: # do fake pattern recognition
-   for sm in self.SmearedHits:
+   counter = 0
+   if withT0:  self.SmearedHits = self.withT0Estimate()
+   # old procedure, not including estimation of t0
+   else:       self.SmearedHits = self.smearHits(withNoStrawSmearing)
+   counter = 0
+   for sm in pseudoCollection:
     detID = self.digiStraw[sm['digiHit']].GetDetectorID()
     station = int(detID/10000000)
     trID = self.sTree.strawtubesPoint[sm['digiHit']].GetTrackID()
@@ -896,12 +901,13 @@ class ShipDigiReco:
       hitPosLists[trID]     = ROOT.std.vector('TVectorD')()
       listOfIndices[trID] = []
       stationCrossed[trID]  = {}
-    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],sm['dist']])
+    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.SmearedHits[counter]['dist']])
     hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
 
     listOfIndices[trID].append(sm['digiHit'])
     if not stationCrossed[trID].has_key(station): stationCrossed[trID][station]=0
     stationCrossed[trID][station]+=1
+    counter += 1
 #
    # for atrack in listOfIndices:
    #   # make tracklets out of trackCandidates, just for testing, should be output of proper pattern recognition
