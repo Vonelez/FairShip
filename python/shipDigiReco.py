@@ -823,7 +823,7 @@ class ShipDigiReco:
 
      if no_amb: smear = p.dist2Wire()
 
-     SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
+     SmearedHits.append( {'digiHit':key, 'dist':smear, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
      if aDigi.isValid():
@@ -849,9 +849,7 @@ class ShipDigiReco:
   self.fitTrack2MC.clear()
 
 #   
-  if withT0:  self.SmearedHits = self.withT0Estimate()
-  # old procedure, not including estimation of t0 
-  else:       self.SmearedHits = self.smearHits(withNoStrawSmearing)
+
   pseudoCollection = self.pseudoCollectionEstimation()
   nTrack = -1
   trackCandidates = []
@@ -868,6 +866,9 @@ class ShipDigiReco:
       atrack_stereo34 = atrack['stereo34']
       atrack_smeared_hits = list(atrack_y12) + list(atrack_stereo12) + list(atrack_y34) + list(atrack_stereo34)
 
+      if withT0:  self.SmearedHits = self.withT0Estimate()
+      # old procedure, not including estimation of t0
+      else:       self.SmearedHits = self.smearHits(withNoStrawSmearing)
       counter = 0
 
       for sm in atrack_smeared_hits:
