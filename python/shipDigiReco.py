@@ -806,7 +806,9 @@ class ShipDigiReco:
      p=self.sTree.strawtubesPoint[key]
 
      # use true t0  construction: 
-     #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
+     # fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
+     driftTime = 0
+
      if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):
          smear = (aDigi.GetDigi() - self.sTree.t0 - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight) * v_drift
      else:
@@ -827,7 +829,7 @@ class ShipDigiReco:
      if aDigi.isValid():
          h['TDC'].Fill(driftTime)
          h['vshape'].Fill(smear, driftTime)
-         # h['vshape_original'].Fill(p.dist2Wire(), driftTime)
+         h['vshape_original'].Fill(p.dist2Wire(), driftTime)
          h['recoDist'].Fill(smear, p.dist2Wire())
 
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
