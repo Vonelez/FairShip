@@ -808,7 +808,8 @@ class ShipDigiReco:
      driftTime = 0
 
      if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):
-         smear = (aDigi.GetDigi() - self.sTree.t0 - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight) * v_drift
+         driftTime = (aDigi.GetDigi() - self.sTree.t0 - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight)
+         smear = driftTime * v_drift
      else:
          TDC = aDigi.GetDigi()
          t0 = self.sTree.t0 + p.GetTime()
