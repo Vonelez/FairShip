@@ -892,7 +892,7 @@ class ShipDigiReco:
    # old procedure, not including estimation of t0
    else:       self.d2wireReco = self.strawHitReconstruction()
    counter = 0
-   for sm in pseudoCollection:
+   for sm in self.prCollection:
     detID = self.digiStraw[sm['digiHit']].GetDetectorID()
     station = int(detID/10000000)
     trID = self.sTree.strawtubesPoint[sm['digiHit']].GetTrackID()
