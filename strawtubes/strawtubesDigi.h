@@ -35,7 +35,7 @@ public:
    Double_t NewDist2WireFromDriftTime(Double_t driftTime);
    Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
    void d2w_dtRelation(const TH1D* TDC, TGraph* graph);
-   void getMinimalDriftTime() {return minimalDriftTime;};
+   Double_t getMinimalDriftTime() {return minimalDriftTime;};
 
     // For turnOn/Off the Drift Time Calculation part
     void UseDefaultDriftTime(bool inDefaultDriftTime) { defaultDriftTime = inDefaultDriftTime;}
