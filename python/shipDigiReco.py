@@ -747,7 +747,7 @@ class ShipDigiReco:
   n = 0
   t0 = 0.
   key = -1
-  SmearedHits = []
+  d2WireReco = []
   v_drift = modules["Strawtubes"].StrawVdrift()
   modules["Strawtubes"].StrawEndPoints(10002001,start,stop)
   z1 = stop.z()
@@ -761,13 +761,13 @@ class ShipDigiReco:
     modules["Strawtubes"].StrawEndPoints(detID,start,stop)
     delt1 = (start[2]-z1)/u.speedOfLight
     t0+=aDigi.GetDigi()-delt1
-    SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':aDigi.GetDigi(), 'detID':detID} )
+    d2WireReco.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':aDigi.GetDigi(), 'detID':detID} )
     n+=1  
   if n>0: t0 = t0/n - 73.2*u.ns
-  for s in SmearedHits:
+  for s in d2WireReco:
     delt1 = (s['z']-z1)/u.speedOfLight
     s['dist'] = (s['dist'] -delt1 -t0)*v_drift 
-  return SmearedHits
+  return d2WireReco
 
  def specialCollectionForPR(self):
   prCollection = []
@@ -823,7 +823,7 @@ class ShipDigiReco:
 
      if MCmode: dist2Wire = p.dist2Wire()
 
-     d2wireReco.append( {'digiHit':key, 'dist':dist2Wire, 'detID':detID} )
+     d2wireReco.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':dist2Wire, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
      if aDigi.isValid():
@@ -838,7 +838,7 @@ class ShipDigiReco:
      if abs(stop.y())<abs(start.y()): h['distv'].Fill(dist2Wire)
 
   return d2wireReco
-  
+
  def findTracks(self):
   hitPosLists    = {}
   stationCrossed = {}
@@ -848,15 +848,17 @@ class ShipDigiReco:
   self.fTrackletsArray.Delete()
   self.fitTrack2MC.clear()
 
-#   
+#
+  if withT0:  self.d2WireReco = self.withT0Estimate()
+  # old procedure, not including estimation of t0
+  else:       self.d2WireReco = self.strawHitReconstruction()
 
-  self.prCollection = self.specialCollectionForPR()
   nTrack = -1
   trackCandidates = []
-  
+
   if realPR:
     # Do real PatRec
-    track_hits = shipPatRec.execute(self.prCollection, ShipGeo, realPR)
+    track_hits = shipPatRec.execute(self.d2WireReco, ShipGeo, realPR)
     # Create hitPosLists for track fit
     for i_track in track_hits.keys():
       atrack = track_hits[i_track]
@@ -865,12 +867,6 @@ class ShipDigiReco:
       atrack_y34 = atrack['y34']
       atrack_stereo34 = atrack['stereo34']
       atrack_smeared_hits = list(atrack_y12) + list(atrack_stereo12) + list(atrack_y34) + list(atrack_stereo34)
-
-      if withT0:  self.d2wireReco = self.withT0Estimate()
-      # old procedure, not including estimation of t0
-      else:       self.d2wireReco = self.strawHitReconstruction()
-      counter = 0
-
       for sm in atrack_smeared_hits:
         detID = sm['detID']
         station = int(detID/10000000)
@@ -880,33 +876,26 @@ class ShipDigiReco:
           hitPosLists[trID] = ROOT.std.vector('TVectorD')()
           listOfIndices[trID] = []
           stationCrossed[trID]  = {}
-        m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist']])
+        m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],sm['dist']])
         hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
         listOfIndices[trID].append(sm['digiHit'])
         if not stationCrossed[trID].has_key(station):
           stationCrossed[trID][station] = 0
         stationCrossed[trID][station] += 1
-        counter += 1
   else: # do fake pattern recognition
-   if withT0:  self.d2wireReco = self.withT0Estimate()
-   # old procedure, not including estimation of t0
-   else:       self.d2wireReco = self.strawHitReconstruction()
-   counter = 0
-   for sm in self.prCollection:
+   for sm in self.d2WireReco:
     detID = self.digiStraw[sm['digiHit']].GetDetectorID()
     station = int(detID/10000000)
     trID = self.sTree.strawtubesPoint[sm['digiHit']].GetTrackID()
-    if not hitPosLists.has_key(trID):   
+    if not hitPosLists.has_key(trID):
       hitPosLists[trID]     = ROOT.std.vector('TVectorD')()
       listOfIndices[trID] = []
       stationCrossed[trID]  = {}
-    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist']])
+    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],sm['dist']])
     hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
-
     listOfIndices[trID].append(sm['digiHit'])
     if not stationCrossed[trID].has_key(station): stationCrossed[trID][station]=0
     stationCrossed[trID][station]+=1
-    counter += 1
 #
    # for atrack in listOfIndices:
    #   # make tracklets out of trackCandidates, just for testing, should be output of proper pattern recognition
@@ -916,7 +905,7 @@ class ShipDigiReco:
    #  aTracklet.setType(3)
    #  for index in listOfIndices[atrack]:
    #    listOfHits.push_back(index)
-#  
+#
   for atrack in hitPosLists:
     if atrack < 0: continue # these are hits not assigned to MC track because low E cut
     pdg    = self.sTree.MCTrack[atrack].GetPdgCode()
