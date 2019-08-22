@@ -809,7 +809,7 @@ class ShipDigiReco:
 
      if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):
          driftTime = (aDigi.GetDigi() - self.sTree.t0 - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight)
-         dist2Wire = driftTime * v_drift
+         dist2wire = driftTime * v_drift
      else:
          TDC = aDigi.GetDigi()
          t0 = self.sTree.t0 + p.GetTime()
@@ -817,20 +817,20 @@ class ShipDigiReco:
          driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
          minimalDriftTime = ROOT.strawtubesDigi.Instance().getMinimalDriftTime()
          if driftTime < minimalDriftTime: driftTime = minimalDriftTime
-         dist2Wire = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
+         dist2wire = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
 
-     if dist2Wire > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+     if dist2wire > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
-     if MCmode: dist2Wire = p.dist2Wire()
+     if MCmode: dist2wire = p.dist2Wire()
 
-     d2wireReco.append( {'digiHit':key, 'dist':dist2Wire, 'detID':detID} )
+     d2wireReco.append( {'digiHit':key, 'dist':dist2wire, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
      if aDigi.isValid():
          h['TDC'].Fill(driftTime)
-         h['vshape'].Fill(dist2Wire, driftTime)
+         h['vshape'].Fill(dist2wire, driftTime)
          h['vshape_original'].Fill(p.dist2Wire(), driftTime)
-         h['recoDist'].Fill(dist2Wire, p.dist2Wire())
+         h['recoDist'].Fill(dist2wire, p.dist2Wire())
 
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(dist2Wire)
