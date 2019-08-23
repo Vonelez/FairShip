@@ -836,9 +836,9 @@ class ShipDigiReco:
          h['recoDist'].Fill(dist2wire, p.dist2Wire())
 
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
-     if abs(stop.y())==abs(start.y()): h['disty'].Fill(dist2Wire)
-     if abs(stop.y())>abs(start.y()): h['distu'].Fill(dist2Wire)
-     if abs(stop.y())<abs(start.y()): h['distv'].Fill(dist2Wire)
+     if abs(stop.y())==abs(start.y()): h['disty'].Fill(dist2wire)
+     if abs(stop.y())>abs(start.y()): h['distu'].Fill(dist2wire)
+     if abs(stop.y())<abs(start.y()): h['distv'].Fill(dist2wire)
 
   return d2wireReco
 
