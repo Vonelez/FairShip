@@ -37,6 +37,7 @@ public:
    Double_t NewDist2WireFromDriftTime(Double_t driftTime);
    Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
    void d2w_dtRelation(const TH1D* TDC, TGraph* graph);
+   Double_t getMinimalDriftTime() {return minimalDriftTime;};
 
     // For turnOn/Off the Drift Time Calculation part
     void UseDefaultDriftTime(bool inDefaultDriftTime) { defaultDriftTime = inDefaultDriftTime;}
@@ -84,6 +85,8 @@ private:
    Double_t newDist2Wire; //! Reconstructed distance to the Wire after drift time smearing
    Double_t f2;
    TRandom3 *rand;
+
+   Double_t minimalDriftTime = 0;
 
    bool defaultDriftTime = false;
    void driftTimeCalculation(Double_t dist2Wire,

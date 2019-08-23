@@ -6,14 +6,15 @@ strawtubesDigi::strawtubesDigi() {
     LandauSigma = 0;
     newDist2Wire = 0;
     f2 = 0;
-    timeDependence = new TF1("timeCoordinate_dependence", "[0]*x*x + [1]");
-    timeDependence->SetParameter(0, 622.8);
-    timeDependence->SetParameter(1, 5.285);
-    leftChain = new TF1("leftChain", "[0]*x*x + [1]");
-    leftChain->SetParameter(1, 5.285);
-    rightChain = new TF1("rightChain", "[0]*x*x + [1]");
-    rightChain->SetParameter(1, 5.285);
-    rand = new TRandom3();
+   minimalDriftTime = 5.285;
+   timeDependence = new TF1("timeCoordinate_dependence", "[0]*x*x + [1]");
+   timeDependence->SetParameter(0, 622.8);
+   timeDependence->SetParameter(1, minimalDriftTime);
+   leftChain = new TF1("leftChain", "[0]*x*x + [1]");
+   leftChain->SetParameter(1, minimalDriftTime);
+   rightChain = new TF1("rightChain", "[0]*x*x + [1]");
+   rightChain->SetParameter(1, minimalDriftTime);
+   rand = new TRandom3();
 }
 
 strawtubesDigi::~strawtubesDigi() {
