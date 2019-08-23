@@ -772,8 +772,8 @@ class ShipDigiReco:
     s['dist'] = (s['dist'] -delt1 -t0)*v_drift 
   return SmearedHits
 
- def pseudoCollectionEstimation(self):
-  pseudoCollection = []
+ def specialCollectionForPR(self):
+  prCollection = []
   key = -1
   modules["Strawtubes"].StrawEndPoints(10002001,start,stop)
   for aDigi in self.digiStraw:
@@ -784,12 +784,12 @@ class ShipDigiReco:
       station = int(detID/10000000)
       if station > 4 : continue
       modules["Strawtubes"].StrawEndPoints(detID,start,stop)
-      pseudoCollection.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(), 'detID':detID} )
-  return pseudoCollection
+      prCollection.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(), 'detID':detID} )
+  return prCollection
 
- def smearHits(self,no_amb=None):
+ def strawHitReconstruction(self,MCmode=None):
  # smear strawtube points
-  SmearedHits = []
+  d2wireReco = []
   key = -1
   v_drift = modules["Strawtubes"].StrawVdrift()
   modules["Strawtubes"].StrawEndPoints(10002001,start,stop)
@@ -806,40 +806,42 @@ class ShipDigiReco:
      delt1 = (start[2]-z1)/u.speedOfLight
      p=self.sTree.strawtubesPoint[key]
 
-     # use true t0  construction: 
+     # use true t0  construction:
      # fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
      driftTime = 0
 
-     if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):	# using drift velocity calculation
-         smear = (aDigi.GetDigi() - self.sTree.t0 - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight) * v_drift
-     else:	# for the updated drift time calculation method
+     if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):
+         driftTime = (aDigi.GetDigi() - self.sTree.t0 - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight)
+         dist2wire = driftTime * v_drift
+     else:
          TDC = aDigi.GetDigi()
          t0 = self.sTree.t0 + p.GetTime()
          signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
          driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
-         if driftTime < 5.285: driftTime = 5.285
-         smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
+         minimalDriftTime = ROOT.strawtubesDigi.Instance().getMinimalDriftTime()
+         if driftTime < minimalDriftTime: driftTime = minimalDriftTime
+         dist2wire = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
 
-     if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+     if dist2wire > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
-     if no_amb: smear = p.dist2Wire()
+     if MCmode: dist2wire = p.dist2Wire()
 
-     SmearedHits.append( {'digiHit':key, 'dist':smear, 'detID':detID} )
+     d2wireReco.append( {'digiHit':key, 'dist':dist2wire, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
      if aDigi.isValid():
          h['TDC'].Fill(driftTime)
-         h['vshape'].Fill(smear, driftTime)
+         h['vshape'].Fill(dist2wire, driftTime)
          h['vshape_original'].Fill(p.dist2Wire(), driftTime)
-         h['recoDist'].Fill(smear, p.dist2Wire())
+         h['recoDist'].Fill(dist2wire, p.dist2Wire())
 
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
-     if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
-     if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
-     if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)
+     if abs(stop.y())==abs(start.y()): h['disty'].Fill(dist2Wire)
+     if abs(stop.y())>abs(start.y()): h['distu'].Fill(dist2Wire)
+     if abs(stop.y())<abs(start.y()): h['distv'].Fill(dist2Wire)
 
-  return SmearedHits
-  
+  return d2wireReco
+
  def findTracks(self):
   hitPosLists    = {}
   stationCrossed = {}
@@ -849,15 +851,13 @@ class ShipDigiReco:
   self.fTrackletsArray.Delete()
   self.fitTrack2MC.clear()
 
-#
-
-  pseudoCollection = self.pseudoCollectionEstimation()
+  self.prCollection = self.specialCollectionForPR()
   nTrack = -1
   trackCandidates = []
-  
+
   if realPR:
     # Do real PatRec
-    track_hits = shipPatRec.execute(pseudoCollection, ShipGeo, realPR)
+    track_hits = shipPatRec.execute(self.prCollection, ShipGeo, realPR)
     # Create hitPosLists for track fit
     for i_track in track_hits.keys():
       atrack = track_hits[i_track]
@@ -867,10 +867,9 @@ class ShipDigiReco:
       atrack_stereo34 = atrack['stereo34']
       atrack_smeared_hits = list(atrack_y12) + list(atrack_stereo12) + list(atrack_y34) + list(atrack_stereo34)
 
-      if withT0:  self.SmearedHits = self.withT0Estimate()
+      if withT0:  self.d2wireReco = self.withT0Estimate()
       # old procedure, not including estimation of t0
-      else:       self.SmearedHits = self.smearHits(withNoStrawSmearing)
-      counter = 0
+      else:       self.d2wireReco = self.strawHitReconstruction()
 
       for sm in atrack_smeared_hits:
         detID = sm['detID']
@@ -881,34 +880,30 @@ class ShipDigiReco:
           hitPosLists[trID] = ROOT.std.vector('TVectorD')()
           listOfIndices[trID] = []
           stationCrossed[trID]  = {}
-        m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.SmearedHits[counter]['dist']])
+        m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[sm['digiHit']]['dist']])
         hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
         listOfIndices[trID].append(sm['digiHit'])
         if not stationCrossed[trID].has_key(station):
           stationCrossed[trID][station] = 0
         stationCrossed[trID][station] += 1
-        counter += 1
   else: # do fake pattern recognition
-   counter = 0
-   if withT0:  self.SmearedHits = self.withT0Estimate()
+   if withT0:  self.d2wireReco = self.withT0Estimate()
    # old procedure, not including estimation of t0
-   else:       self.SmearedHits = self.smearHits(withNoStrawSmearing)
-   counter = 0
-   for sm in pseudoCollection:
+   else:       self.d2wireReco = self.strawHitReconstruction()
+   for sm in self.prCollection:
     detID = self.digiStraw[sm['digiHit']].GetDetectorID()
     station = int(detID/10000000)
     trID = self.sTree.strawtubesPoint[sm['digiHit']].GetTrackID()
-    if not hitPosLists.has_key(trID):   
+    if not hitPosLists.has_key(trID):
       hitPosLists[trID]     = ROOT.std.vector('TVectorD')()
       listOfIndices[trID] = []
       stationCrossed[trID]  = {}
-    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.SmearedHits[counter]['dist']])
+    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[sm['digiHit']]['dist']])
     hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
 
     listOfIndices[trID].append(sm['digiHit'])
     if not stationCrossed[trID].has_key(station): stationCrossed[trID][station]=0
     stationCrossed[trID][station]+=1
-    counter += 1
 #
    # for atrack in listOfIndices:
    #   # make tracklets out of trackCandidates, just for testing, should be output of proper pattern recognition
@@ -918,6 +913,7 @@ class ShipDigiReco:
    #  aTracklet.setType(3)
    #  for index in listOfIndices[atrack]:
    #    listOfHits.push_back(index)
+#
 #  
   for atrack in hitPosLists:
     if atrack < 0: continue # these are hits not assigned to MC track because low E cut
