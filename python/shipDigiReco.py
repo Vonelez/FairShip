@@ -823,6 +823,7 @@ class ShipDigiReco:
          dist2wire = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
 
      if dist2wire > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+     # should be checked later in combining collection
 
      if MCmode: dist2wire = p.dist2Wire()
 
@@ -834,6 +835,7 @@ class ShipDigiReco:
          h['vshape'].Fill(dist2wire, driftTime)
          h['vshape_original'].Fill(p.dist2Wire(), driftTime)
          h['recoDist'].Fill(dist2wire, p.dist2Wire())
+         h['residuals'].Fill(dist2wire - p.dist2Wire())
 
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(dist2wire)

@@ -185,7 +185,7 @@ for iEvent in range(firstEvent, nEvents):
  # mem_monitor() 
 # end loop over events
 h['vshape_original'] = ROOT.strawtubesDigi.Instance().initialVShape.Clone()
-h['residuals'] = ROOT.strawtubesDigi.Instance().residualsInStraw.Clone()
+# h['residuals'] = ROOT.strawtubesDigi.Instance().residualsInStraw.Clone()
 print ROOT.strawtubesDigi.Instance().counter
 # ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
 # cv=h['dist'].cd(1)
