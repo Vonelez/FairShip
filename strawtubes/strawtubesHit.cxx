@@ -32,6 +32,8 @@ strawtubesHit::strawtubesHit(Int_t detID, Float_t tdc)
 strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
   : ShipHit()
 {
+   //updated
+
      TVector3 start = TVector3();
      TVector3 stop  = TVector3();
      fDetectorID = p->GetDetectorID();
