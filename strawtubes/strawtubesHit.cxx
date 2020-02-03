@@ -32,8 +32,7 @@ strawtubesHit::strawtubesHit(Int_t detID, Float_t tdc)
 strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
   : ShipHit()
 {
-   //updated
-
+     bool inSmallArea = false;
      TVector3 start = TVector3();
      TVector3 stop  = TVector3();
      fDetectorID = p->GetDetectorID();
@@ -41,9 +40,43 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      Double_t v_drift       = module->StrawVdrift();
      Double_t sigma_spatial = module->StrawSigmaSpatial();
      module->StrawEndPoints(fDetectorID,start,stop);
-     Double_t t_drift = fabs( gRandom->Gaus( p->dist2Wire(), sigma_spatial ) )/v_drift;
-     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
-     flag = true;
+
+     // recaluclate dist2wire with misalign
+     flag = false;
+     Double_t dist2Wire;
+     TVector3 pPos;
+     if (strawtubesDigi::Instance().IsMisalign())
+     {
+        pPos = TVector3(p->GetX(), p->GetY(), p->GetZ());
+        flag = strawtubesDigi::Instance().CheckInTube(pPos,start,stop,fDetectorID);
+        if (flag)
+        {
+           dist2Wire = strawtubesDigi::Instance().FindMisalignDist2Wire(pPos,start,stop,fDetectorID);
+        }
+     }
+     else
+     {
+        flag = true;
+        dist2Wire = p->dist2Wire();
+     }
+
+     if (flag)
+     {
+        if (strawtubesDigi::Instance().IsDefaultDriftTime())
+        {
+            driftTime = fabs( gRandom->Gaus( dist2Wire, sigma_spatial ) )/v_drift;
+        }
+        else
+        {
+           inSmallArea = strawtubesDigi::Instance().InSmallerSection(pPos, start, stop, fDetectorID);
+           Double_t wireOffset = strawtubesDigi::Instance().GetWireOffset(fDetectorID);
+           driftTime = strawtubesDigi::Instance().DriftTimeFromDist2Wire(dist2Wire, wireOffset, inSmallArea);
+        }
+        fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
+     }
+     else fdigi = -1;
+     if (dist2Wire > 0.6) strawtubesDigi::Instance().counter++;
+     strawtubesDigi::Instance().initialVShape->Fill(dist2Wire, driftTime);
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
 {

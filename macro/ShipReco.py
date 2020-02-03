@@ -1,11 +1,20 @@
 #!/usr/bin/env python
-from __future__ import print_function
-from __future__ import division
-from argparse import ArgumentParser
-
+inputFile = 'ship.conical.Pythia8-TGeant4.root'
+geoFile   = None
+debug = False
+EcalDebugDraw = False
+withNoStrawSmearing = None # True   for debugging purposes
+nEvents    = 999999
+firstEvent = 0
 withHists = True
+vertexing = True
+dy  = None
+saveDisk  = False # remove input file
 pidProton = False # if true, take truth, if False fake with pion mass
- 
+realPR = ''
+realPROptions=["FH", "AR", "TemplateMatching"]
+withT0 = False
+
 import resource
 def mem_monitor():
  # Getting virtual memory size 
@@ -23,6 +32,7 @@ import global_variables
 import rootUtils as ut
 import shipunit as u
 import shipRoot_conf
+from ROOT import TGraph, TFile
 
 shipRoot_conf.configure()
 
@@ -47,7 +57,7 @@ parser.add_argument("--Debug",           dest="Debug", help="Switch on debugging
 
 options = parser.parse_args()
 vertexing = not options.noVertexing
- 
+
 if options.EcalDebugDraw: ROOT.gSystem.Load("libASImage")
 
 # need to figure out which geometry was used, only needed if no geo file
@@ -62,11 +72,11 @@ if not options.dy:
 print('configured to process ', options.nEvents, ' events from ', options.inputFile,
       ' starting with event ', options.firstEvent, ' with option Yheight = ' ,dy,
       ' with vertexing', vertexing, ' and real pattern reco ', options.realPR)
-if not options.inputFile.find('_rec.root') < 0: 
+if not options.inputFile.find('_rec.root') < 0:
   outFile   = options.inputFile
-  options.inputFile = outFile.replace('_rec.root','.root') 
+  options.inputFile = outFile.replace('_rec.root','.root')
 else:
-  outFile = options.inputFile.replace('.root','_rec.root') 
+  outFile = options.inputFile.replace('.root','_rec.root')
 # outfile should be in local directory
   tmp = outFile.split('/')
   outFile = tmp[len(tmp)-1]
@@ -91,11 +101,17 @@ ecalGeoFile = ShipGeo.ecal.File
 h={}
 log={}
 if withHists:
- ut.bookHist(h,'distu','distance to wire',100,0.,5.)
- ut.bookHist(h,'distv','distance to wire',100,0.,5.)
- ut.bookHist(h,'disty','distance to wire',100,0.,5.)
+ ut.bookHist(h,'distu','distance to wire',100,0.,2.)
+ ut.bookHist(h,'distv','distance to wire',100,0.,2.)
+ ut.bookHist(h,'disty','distance to wire',100,0.,2.)
  ut.bookHist(h,'nmeas','nr measuerements',100,0.,50.)
  ut.bookHist(h,'chi2','Chi2/DOF',100,0.,20.)
+ ut.bookHist(h,'vshape','Drift Time vs distance to wire; Distance, cm; Time, ns',1000,0.,0.,10000,0.,0.)
+ ut.bookHist(h,'vshape_original','Drift Time vs distance to wire; Distance, cm; Time, ns',1000,0.,0.,10000,0.,0.)
+ ut.bookHist(h,'recoDist','Reco dist vs distance to wire; Reco Distance, cm; Distance to the wire, cm',250,0.,2.5,100,0.,1.)
+ ut.bookHist(h,'TDC','TDC',1000,0.,0.)
+ ut.bookHist(h,'driftTime','driftTime',500,0.,1500)
+ ut.bookHist(h,'residuals','residuals',2000,-1,1)
 
 import shipDet_conf
 run = ROOT.FairRunSim()
@@ -141,6 +157,6 @@ for global_variables.iEvent in range(options.firstEvent, options.nEvents):
     SHiP.digitize()
     SHiP.reconstruct()
  # memory monitoring
- # mem_monitor()
+ # mem_monitor() 
 # end loop over events
 SHiP.finish()

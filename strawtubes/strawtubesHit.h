@@ -4,6 +4,7 @@
 
 #include "ShipHit.h"
 #include "strawtubesPoint.h"
+#include "strawtubesDigi.h"
 #include "TObject.h"
 #include "TVector3.h"
 
@@ -37,6 +38,8 @@ class strawtubesHit : public ShipHit
     strawtubesHit operator=(const strawtubesHit& point);
 
     Float_t flag;   ///< flag
+    Double_t smearHit;
+    Double_t driftTime;
 
     ClassDef(strawtubesHit,3);
     
