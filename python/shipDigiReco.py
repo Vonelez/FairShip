@@ -637,7 +637,7 @@ class ShipDigiReco:
            #if (Dy<=(err_y_1+err_y_2) and Dz<=6*(err_z_1+err_z_2) and Dx<=(err_x_1+err_x_2) and Dz>0. ):
                  list_neighbours.append(hit2)
        else:
-         print "-- getNeighbours: ERROR: step not defined "
+         print ("-- getNeighbours: ERROR: step not defined ")
 
    return list_neighbours
 
