@@ -856,11 +856,6 @@ class ShipDigiReco:
   self.fitTrack2MC.clear()
 
 #   
-  if global_variables.withT0:
-    self.SmearedHits = self.withT0Estimate()
-  # old procedure, not including estimation of t0
-  else:
-    self.SmearedHits = self.smearHits(global_variables.withNoStrawSmearing)
 
   self.prCollection = self.specialCollectionForPR()
   nTrack = -1
