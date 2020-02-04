@@ -722,7 +722,7 @@ class ShipDigiReco:
    # misalign part
    beingInit = ROOT.strawtubesDigi.Instance().IsInitialized()
    if (stm.misalign and (not beingInit)):
-     ROOT.strawtubesDigi.Instance().PassRadius(ShipGeo.strawtubes.InnerStrawDiameter/2.)
+     ROOT.strawtubesDigi.Instance().PassRadius(global_variables.ShipGeo.strawtubes.InnerStrawDiameter/2.)
      ROOT.strawtubesDigi.Instance().SetDebug(stm.debug)
      if stm.randType == "None":
        ROOT.strawtubesDigi.Instance().SetSameSagging(stm.maxTubeSagging, stm.maxWireSagging)
