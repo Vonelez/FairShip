@@ -777,7 +777,7 @@ class ShipDigiReco:
  def specialCollectionForPR(self):
   prCollection = []
   key = -1
-  modules["Strawtubes"].StrawEndPoints(10002001,start,stop)
+  global_variables.modules["Strawtubes"].StrawEndPoints(10002001,start,stop)
   for aDigi in self.digiStraw:
       key+=1
       if not aDigi.isValid(): continue
@@ -785,7 +785,7 @@ class ShipDigiReco:
       # don't use hits from straw veto
       station = int(detID/10000000)
       if station > 4 : continue
-      modules["Strawtubes"].StrawEndPoints(detID,start,stop)
+      global_variables.modules["Strawtubes"].StrawEndPoints(detID,start,stop)
       prCollection.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(), 'detID':detID} )
   return prCollection
 
@@ -824,7 +824,7 @@ class ShipDigiReco:
          if driftTime < minimalDriftTime: driftTime = minimalDriftTime
          dist2wire = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
 
-     if dist2wire > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+     if dist2wire > global_variables.ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
      if MCmode: dist2wire = p.dist2Wire()
 
