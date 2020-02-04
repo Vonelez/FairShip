@@ -1,5 +1,9 @@
+from __future__ import print_function
+from __future__ import division
 import os,ROOT,shipVertex,shipDet_conf
-if realPR == "Prev": import shipPatRec_prev as shipPatRec # The previous version of the pattern recognition
+import global_variables
+if global_variables.realPR == "Prev":
+  import shipPatRec_prev as shipPatRec # The previous version of the pattern recognition
 else: import shipPatRec
 import shipunit as u
 import rootUtils as ut
@@ -15,7 +19,7 @@ class ShipDigiReco:
   self.fn = ROOT.TFile.Open(fout,'update')
   self.sTree     = self.fn.cbmsim
   if self.sTree.GetBranch("FitTracks"):
-    print "remove RECO branches and rerun reconstruction"
+    print("remove RECO branches and rerun reconstruction")
     self.fn.Close()    
     # make a new file without reco branches
     f = ROOT.TFile(fout)
@@ -88,8 +92,8 @@ class ShipDigiReco:
   self.digiMuon    = ROOT.TClonesArray("muonHit")
   self.digiMuonBranch=self.sTree.Branch("Digi_muonHits",self.digiMuon,32000,-1)
 # for the digitizing step
-  self.v_drift = modules["Strawtubes"].StrawVdrift()
-  self.sigma_spatial = modules["Strawtubes"].StrawSigmaSpatial()
+  self.v_drift = global_variables.modules["Strawtubes"].StrawVdrift()
+  self.sigma_spatial = global_variables.modules["Strawtubes"].StrawSigmaSpatial()
 # optional if present, splitcalCluster
   if self.sTree.GetBranch("splitcalPoint"):
    self.digiSplitcal = ROOT.TClonesArray("splitcalHit") 
@@ -101,10 +105,10 @@ class ShipDigiReco:
   self.caloTasks = []  
   if self.sTree.GetBranch("EcalPoint") and not self.sTree.GetBranch("splitcalPoint"):
 # Creates. exports and fills calorimeter structure
-   dflag = 0
-   if debug: dflag = 10
-   ecalGeo = ecalGeoFile+'z'+str(ShipGeo.ecal.z)+".geo"
-   if not ecalGeo in os.listdir(os.environ["FAIRSHIP"]+"/geometry"): shipDet_conf.makeEcalGeoFile(ShipGeo.ecal.z,ShipGeo.ecal.File)
+   dflag = 10 if global_variables.debug else 0
+   ecalGeo = global_variables.ecalGeoFile + 'z' + str(global_variables.ShipGeo.ecal.z) + ".geo"
+   if not ecalGeo in os.listdir(os.environ["FAIRSHIP"]+"/geometry"):
+     shipDet_conf.makeEcalGeoFile(global_variables.ShipGeo.ecal.z, global_variables.ShipGeo.ecal.File)
    ecalFiller=ROOT.ecalStructureFiller("ecalFiller", dflag,ecalGeo)
    ecalFiller.SetUseMCPoints(ROOT.kTRUE)
    ecalFiller.StoreTrackInformation()
@@ -144,7 +148,7 @@ class ShipDigiReco:
 # Match reco to MC
    ecalMatch=ROOT.ecalMatch('ecalMatch',0)
    self.caloTasks.append(ecalMatch)
-   if EcalDebugDraw:
+   if global_variables.EcalDebugDraw:
  # ecal drawer: Draws calorimeter structure, incoming particles, clusters, maximums
     ecalDrawer=ROOT.ecalDrawer("clusterFinder",10)
     self.caloTasks.append(ecalDrawer)
@@ -152,7 +156,7 @@ class ShipDigiReco:
    import shipPid
    self.caloTasks.append(shipPid.Task(self))
 # prepare vertexing
-  self.Vertexing = shipVertex.Task(h,self.sTree)
+  self.Vertexing = shipVertex.Task(global_variables.h, self.sTree)
 # setup random number generator 
   self.random = ROOT.TRandom()
   ROOT.gRandom.SetSeed(13)
@@ -160,7 +164,7 @@ class ShipDigiReco:
 # access ShipTree
   self.sTree.GetEvent(0)
   if len(self.caloTasks)>0:
-   print "** initialize Calo reconstruction **" 
+   print("** initialize Calo reconstruction **")
    self.ecalStructure     = ecalFiller.InitPython(self.sTree.EcalPointLite)
    ecalDigi.InitPython(self.ecalStructure)
    ecalPrepare.InitPython(self.ecalStructure)
@@ -171,7 +175,8 @@ class ShipDigiReco:
    self.ecalReconstructed = ecalReco.InitPython(self.sTree.EcalClusters, self.ecalStructure, self.ecalCalib)
    self.EcalReconstructed = self.sTree.Branch("EcalReconstructed",self.ecalReconstructed,32000,-1)
    ecalMatch.InitPython(self.ecalStructure, self.ecalReconstructed, self.sTree.MCTrack)
-   if EcalDebugDraw: ecalDrawer.InitPython(self.sTree.MCTrack, self.sTree.EcalPoint, self.ecalStructure, self.ecalClusters)
+   if global_variables.EcalDebugDraw:
+     ecalDrawer.InitPython(self.sTree.MCTrack, self.sTree.EcalPoint, self.ecalStructure, self.ecalClusters)
   else:
    ecalClusters      = ROOT.TClonesArray("ecalCluster") 
    ecalReconstructed = ROOT.TClonesArray("ecalReconstructed") 
@@ -183,7 +188,7 @@ class ShipDigiReco:
   self.geoMat =  ROOT.genfit.TGeoMaterialInterface()
 #
   self.bfield = ROOT.genfit.FairShipFields()
-  self.bfield.setField(fieldMaker.getGlobalField())
+  self.bfield.setField(global_variables.fieldMaker.getGlobalField())
   self.fM = ROOT.genfit.FieldManager.getInstance()
   self.fM.init(self.bfield)
   ROOT.genfit.MaterialEffects.getInstance().init(self.geoMat)
@@ -193,9 +198,9 @@ class ShipDigiReco:
   #fitter          = ROOT.genfit.KalmanFitterRefTrack()
   self.fitter      = ROOT.genfit.DAF()
   self.fitter.setMaxIterations(50)
-  if debug: self.fitter.setDebugLvl(1) # produces lot of printout
+  if global_variables.debug:
+    self.fitter.setDebugLvl(1) # produces lot of printout
   #set to True if "real" pattern recognition is required also
-  if debug == True: shipPatRec.debug = 1
 
 # for 'real' PatRec
   shipPatRec.initialize(fgeo)
@@ -212,7 +217,7 @@ class ShipDigiReco:
    if len(self.caloTasks)>0:
     self.EcalClusters.Fill()
     self.EcalReconstructed.Fill()
-   if vertexing:
+   if global_variables.vertexing:
 # now go for 2-track combinations
     self.Vertexing.execute()
 

@@ -1,19 +1,10 @@
 #!/usr/bin/env python
-inputFile = 'ship.conical.Pythia8-TGeant4.root'
-geoFile   = None
-debug = False
-EcalDebugDraw = False
-withNoStrawSmearing = None # True   for debugging purposes
-nEvents    = 999999
-firstEvent = 0
+from __future__ import print_function
+from __future__ import division
+from argparse import ArgumentParser
+
 withHists = True
-vertexing = True
-dy  = None
-saveDisk  = False # remove input file
 pidProton = False # if true, take truth, if False fake with pion mass
-realPR = ''
-realPROptions=["FH", "AR", "TemplateMatching"]
-withT0 = False
 
 import resource
 def mem_monitor():
@@ -101,9 +92,9 @@ ecalGeoFile = ShipGeo.ecal.File
 h={}
 log={}
 if withHists:
- ut.bookHist(h,'distu','distance to wire',100,0.,2.)
- ut.bookHist(h,'distv','distance to wire',100,0.,2.)
- ut.bookHist(h,'disty','distance to wire',100,0.,2.)
+ ut.bookHist(h,'distu','distance to wire',100,0.,5.)
+ ut.bookHist(h,'distv','distance to wire',100,0.,5.)
+ ut.bookHist(h,'disty','distance to wire',100,0.,5.)
  ut.bookHist(h,'nmeas','nr measuerements',100,0.,50.)
  ut.bookHist(h,'chi2','Chi2/DOF',100,0.,20.)
  ut.bookHist(h,'vshape','Drift Time vs distance to wire; Distance, cm; Time, ns',1000,0.,0.,10000,0.,0.)
