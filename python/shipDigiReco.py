@@ -838,11 +838,11 @@ class ShipDigiReco:
          global_variables.h['recoDist'].Fill(dist2wire, p.dist2Wire())
 
      if abs(stop.y()) == abs(start.y()):
-     global_variables.h['disty'].Fill(dist2Wire)
+       global_variables.h['disty'].Fill(dist2Wire)
      elif abs(stop.y()) > abs(start.y()):
-     global_variables.h['distu'].Fill(dist2Wire)
+       global_variables.h['distu'].Fill(dist2Wire)
      elif abs(stop.y()) < abs(start.y()):
-     global_variables.h['distv'].Fill(dist2Wire)
+       global_variables.h['distv'].Fill(dist2Wire)
 
   return d2wireReco
   
