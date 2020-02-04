@@ -637,7 +637,7 @@ class ShipDigiReco:
            #if (Dy<=(err_y_1+err_y_2) and Dz<=6*(err_z_1+err_z_2) and Dx<=(err_x_1+err_x_2) and Dz>0. ):
                  list_neighbours.append(hit2)
        else:
-         print ("-- getNeighbours: ERROR: step not defined ")
+         print("-- getNeighbours: ERROR: step not defined ")
 
    return list_neighbours
 
@@ -653,7 +653,7 @@ class ShipDigiReco:
      self.digiTimeDet[index]=aHit
      detID = aHit.GetDetectorID()
      if aHit.isValid():
-      if hitsPerDetId.has_key(detID):
+      if detID in hitsPerDetId:
        t = aHit.GetMeasurements()
        ct = aHit.GetMeasurements()
 # this is not really correct, only first attempt
@@ -674,7 +674,7 @@ class ShipDigiReco:
      self.digiMuon[index]=aHit
      detID = aHit.GetDetectorID()
      if aHit.isValid():
-      if hitsPerDetId.has_key(detID):
+      if detID in hitsPerDetId:
        if self.digiMuon[hitsPerDetId[detID]].GetDigi() > aHit.GetDigi():
  # second hit with smaller tdc
         self.digiMuon[hitsPerDetId[detID]].setValidity(0)
@@ -690,7 +690,7 @@ class ShipDigiReco:
        key+=1
        detID=aMCPoint.GetDetectorID()
        Eloss=aMCPoint.GetEnergyLoss()
-       if not ElossPerDetId.has_key(detID): 
+       if detID not in ElossPerDetId:
         ElossPerDetId[detID]=0
         listOfVetoPoints[detID]=[]
         tOfFlight[detID]=[]
@@ -731,7 +731,7 @@ class ShipDigiReco:
      elif stm.randType == "Unif":
        ROOT.strawtubesDigi.Instance().SetUnifSagging(stm.maxTubeSagging, stm.tubeUnifDelta, stm.maxWireSagging, stm.wireUnifDelta)
      else:
-       print "Not a proper type of distribution for strawtube sagging"
+       print ("Not a proper type of distribution for strawtube sagging")
    index = 0
    hitsPerDetId = {}
    for aMCPoint in self.sTree.strawtubesPoint:
