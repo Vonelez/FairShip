@@ -12,7 +12,7 @@ class StrawtubesMisalign:
     # maximum sagging at the middle of the tube
     # for using distribution, these are mean value /mpv /something like that
     maxTubeSagging = 0.0*u.cm
-    maxWireSagging = 0.7*u.cm
+    maxWireSagging = 0.0*u.cm
 
     # uniform distribtion, the delta is half of the range
     tubeUnifDelta = 0.0*u.cm
@@ -26,6 +26,6 @@ class StrawtubesMisalign:
     debug = False
 
 class DriftTimeCalculate:
-    defaultDriftTime = True
+    defaultDriftTime = False
 
 
