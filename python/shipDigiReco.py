@@ -873,7 +873,7 @@ class ShipDigiReco:
       atrack_stereo34 = atrack['stereo34']
       atrack_smeared_hits = list(atrack_y12) + list(atrack_stereo12) + list(atrack_y34) + list(atrack_stereo34)
 
-      if withT0:  self.d2wireReco = self.withT0Estimate()
+      if global_variables.withT0:  self.d2wireReco = self.withT0Estimate()
       # old procedure, not including estimation of t0
       else:       self.d2wireReco = self.strawHitReconstruction()
       counter = 0
@@ -895,7 +895,7 @@ class ShipDigiReco:
         stationCrossed[trID][station] += 1
         counter += 1
   else: # do fake pattern recognition
-   if withT0:  self.d2wireReco = self.withT0Estimate()
+   if global_variables.withT0:  self.d2wireReco = self.withT0Estimate()
    # old procedure, not including estimation of t0
    else:       self.d2wireReco = self.strawHitReconstruction()
    counter = 0
