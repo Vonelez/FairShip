@@ -237,6 +237,25 @@ Double_t strawtubesDigi::GetMaxWireSagging(Int_t ID)
     }
 }
 
+Double_t strawtubesDigi::CheckSagging(Int_t ID)
+{
+    Double_t deltaWire = GetMaxWireSagging(ID);
+    if (randType != None)
+    {
+        while (fabs(GetMaxWireSagging(ID) - GetMaxTubeSagging(ID)) >= tubeRadius)
+	{
+	    wireSaggingMap[ID] = 0;
+	    deltaWire = GetMaxWireSagging(ID);
+	}
+    }
+    else
+    {
+	if (maxWireSagging - maxTubeSagging >= tubeRadius) {deltaWire = maxTubeSagging + tubeRadius - 0.001;}
+	else if (maxWireSagging - maxTubeSagging <= -tubeRadius) {deltaWire = maxTubeSagging - tubeRadius + 0.001;}
+    }
+    return deltaWire;
+}
+
 Double_t strawtubesDigi::FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Int_t ID)
 {
    Double_t delta = GetMaxTubeSagging(ID);
@@ -250,6 +269,7 @@ Double_t strawtubesDigi::FindTubeShift(Double_t x, Double_t startx, Double_t sto
 Double_t strawtubesDigi::FindWireShift(Double_t x, Double_t startx, Double_t stopx, Int_t ID)
 {
    Double_t delta = GetMaxWireSagging(ID);
+   delta = CheckSagging(ID);
    Double_t a = -4. * delta / TMath::Sq(startx - stopx);
    Double_t b = 0.5 * (startx + stopx);
    Double_t c = delta;
