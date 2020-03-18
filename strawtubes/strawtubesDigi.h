@@ -47,10 +47,10 @@ public:
     void SetSameSagging(Double_t inMaxTubeSagging, Double_t inMaxWireSagging);
     void SetGausSagging(Double_t inMaxTubeSagging, Double_t inTubeGausSigma, Double_t inMaxWireSagging, Double_t inWireGausSigma);
     void SetUnifSagging(Double_t inMaxTubeSagging, Double_t inTubeUnifDelta, Double_t inMaxWireSagging, Double_t inWireUnifDelta);
-    bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
-    Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
+    bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID);
+    Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID);
     Double_t FindMisalignDist2Wire(strawtubesPoint* p);
-    bool InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
+    bool InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID);
     bool IsMisalign() { return misalign;}
     bool IsInitialized() { return beingInit;}
 
@@ -58,7 +58,7 @@ public:
     void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug);
     void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug);
 
-   Double_t GetWireOffset(Float_t ID);
+   Double_t GetWireOffset(Int_t ID);
    TH2D *initialVShape = new TH2D("initialVShape", "initialVShape", 1200, 0., 1.2, 1500, 0, 1500);
    TH1D *residualsInStraw = new TH1D("resid", "resid", 10000, -1, 1);
    Int_t counter = 0;
@@ -102,18 +102,18 @@ private:
     Double_t wireGausSigma = 0.0;
     Double_t tubeUnifDelta = 0.0;
     Double_t wireUnifDelta = 0.0;
-    std::map<Float_t, Double_t> tubeSaggingMap;
-    std::map<Float_t, Double_t> wireSaggingMap;
+    std::map<Int_t, Double_t> tubeSaggingMap;
+    std::map<Int_t, Double_t> wireSaggingMap;
     bool misalign = false;
     RandType randType = None;
     bool debug = false;
     bool beingInit = false;
 
-    Double_t FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
-    Double_t FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
-    Double_t GetMaxTubeSagging(Float_t ID);
-    Double_t GetMaxWireSagging(Float_t ID);
-    Double_t FindWireSlope(Double_t x, TVector3 start, TVector3 stop, Float_t ID);
+    Double_t FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Int_t ID);
+    Double_t FindWireShift(Double_t x, Double_t startx, Double_t stopx, Int_t ID);
+    Double_t GetMaxTubeSagging(Int_t ID);
+    Double_t GetMaxWireSagging(Int_t ID);
+    Double_t FindWireSlope(Double_t x, TVector3 start, TVector3 stop, Int_t ID);
 
 };
 
