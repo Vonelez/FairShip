@@ -200,12 +200,13 @@ Double_t strawtubesDigi::GetMaxTubeSagging(Float_t ID)
           if (randType == Gaus) //not yet finished, need a condition check to prevent non physics result
           {
               tubeSaggingMap[ID] = rand->Gaus(maxTubeSagging, tubeGausSigma);
+              while (tubeSaggingMap[ID] < 0) {tubeSaggingMap[ID] = rand->Gaus(maxTubeSagging, tubeGausSigma);}
           }
           else if (randType == Unif)
           {
               tubeSaggingMap[ID] = rand->Uniform(maxTubeSagging - tubeUnifDelta, maxTubeSagging + tubeUnifDelta);
+              while (tubeSaggingMap[ID] < 0) {tubeSaggingMap[ID] = rand->Uniform(maxTubeSagging - tubeUnifDelta, maxTubeSagging + tubeUnifDelta);}
           }
-          if (tubeSaggingMap[ID] < 0){ tubeSaggingMap[ID] = 0;}
        }
        return tubeSaggingMap[ID];
     }
@@ -224,12 +225,13 @@ Double_t strawtubesDigi::GetMaxWireSagging(Float_t ID)
           if (randType == Gaus) // not yet finished
           {
               wireSaggingMap[ID] = rand->Gaus(maxWireSagging, wireGausSigma);
+              while (wireSaggingMap[ID] < 0) {wireSaggingMap[ID] = rand->Gaus(maxWireSagging, wireGausSigma);}
           }
           else if (randType == Unif)
           {
               wireSaggingMap[ID] = rand->Uniform(maxWireSagging - wireUnifDelta, maxWireSagging + wireUnifDelta);
+              while (wireSaggingMap[ID] < 0) {wireSaggingMap[ID] = rand->Uniform(maxWireSagging - wireUnifDelta, maxWireSagging + wireUnifDelta);}
           }
-          if (wireSaggingMap[ID] < 0){ wireSaggingMap[ID] = 0;}
        }
        return wireSaggingMap[ID];
     }
