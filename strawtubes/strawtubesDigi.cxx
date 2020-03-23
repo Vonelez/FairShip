@@ -280,14 +280,17 @@ Double_t strawtubesDigi::FindWireShift(Double_t x, Double_t startx, Double_t sto
 bool strawtubesDigi::CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID)
 {
    Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), ID);
-   TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1. / (start.x() - stop.x()));
-
+   //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1. / (start.x() - stop.x()));
+   TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
    Double_t r = tubeRadius;
+   //wPos = wPos - TVector3(0,tubeshift,0);
+   //TVector3 dr = pPos - wPos;  
    Double_t theta = TMath::ATan((start.y() - stop.y()) / (start.x() - stop.x()));
    Double_t dz = pPos.z() - wPos.z();
    Double_t h = TMath::Sqrt(r * r - dz * dz) / TMath::Cos(theta);
 
    if ((h - (pPos.y() - wPos.y())) < tubeShift) {
+   //if (dr.Mag() > r) {
       //       if (debug){ std::cout<<"OutOfTube"<<std::endl; }
       return false;
    }
@@ -310,7 +313,8 @@ Double_t strawtubesDigi::FindWireSlope(Double_t x, TVector3 start, TVector3 stop
 Double_t strawtubesDigi::FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID)
 {
     // Approimate version, linearlized locally for the wire,
-    TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
     Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
     TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
     //return dr.Mag();
@@ -340,7 +344,8 @@ Double_t strawtubesDigi::FindMisalignDist2Wire(strawtubesPoint* p)
     module->StrawEndPoints(ID,start,stop);
 
     // Approimate version
-    TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
     Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
     TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
     //return dr.Mag();
@@ -362,7 +367,8 @@ Double_t strawtubesDigi::FindMisalignDist2Wire(strawtubesPoint* p)
 
 bool strawtubesDigi::InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID)
 {
-   TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1. / (start.x() - stop.x()));
+   //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1. / (start.x() - stop.x()));
+   TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
    Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
    Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), ID);
    residualsInStraw->Fill(wPos.z() - pPos.z());
