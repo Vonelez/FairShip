@@ -41,7 +41,7 @@ class strawtubesHit : public ShipHit
     Double_t smearHit;
     Double_t driftTime;
 
-    ClassDef(strawtubesHit,3);
+    ClassDef(strawtubesHit,4);
     
 
 };
