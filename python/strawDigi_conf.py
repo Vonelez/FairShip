@@ -26,6 +26,6 @@ class StrawtubesMisalign:
     debug = False
 
 class DriftTimeCalculate:
-    defaultDriftTime = False
+    defaultDriftTime = True
 
 
