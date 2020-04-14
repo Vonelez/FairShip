@@ -277,26 +277,6 @@ Double_t strawtubesDigi::FindWireShift(Double_t x, Double_t startx, Double_t sto
    return a * TMath::Sq(x - b) + c;
 }
 
-bool strawtubesDigi::CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID)
-{
-   Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), ID);
-   //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1. / (start.x() - stop.x()));
-   TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
-   Double_t r = tubeRadius;
-   //wPos = wPos - TVector3(0,tubeshift,0);
-   //TVector3 dr = pPos - wPos;  
-   Double_t theta = TMath::ATan((start.y() - stop.y()) / (start.x() - stop.x()));
-   Double_t dz = pPos.z() - wPos.z();
-   Double_t h = TMath::Sqrt(r * r - dz * dz) / TMath::Cos(theta);
-
-   if ((h - (pPos.y() - wPos.y())) < tubeShift) {
-   //if (dr.Mag() > r) {
-      //       if (debug){ std::cout<<"OutOfTube"<<std::endl; }
-      return false;
-   }
-   return true;
-}
-
 Double_t strawtubesDigi::FindWireSlope(Double_t x, TVector3 start, TVector3 stop, Int_t ID)
 {
     Double_t startx = start.x();
@@ -310,26 +290,81 @@ Double_t strawtubesDigi::FindWireSlope(Double_t x, TVector3 start, TVector3 stop
     return slope;
 }
 
+Double_t strawtubesDigi::FindTubeSlope(Double_t x, TVector3 start, TVector3 stop, Int_t ID)
+{
+    Double_t startx = start.x();
+    Double_t stopx = stop.x();
+    Double_t delta = GetMaxTubeSagging(ID);
+    Double_t a = -4. * delta / TMath::Sq(startx - stopx);
+    Double_t b = 0.5 * (startx + stopx);
+
+    Double_t slope = 2 * a * (x - b);
+    slope = slope + (start.y() - stop.y())/(startx - stopx);
+    return slope;
+}
+
+bool strawtubesDigi::CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID)
+{
+   Double_t tubeSlope = FindTubeSlope(pPos.x(), start, stop, ID);
+   Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), ID);
+   Double_t origTubeCenter = stop.y() + ((start.y() - stop.y())/(start.x() - stop.x())) * (pPos.x() - stop.x());
+   Double_t newTubeCenter = origTubeCenter - tubeShift;
+   Double_t dist2newCenter2 = TMath::Sq(pPos.y() - newTubeCenter) / TMath::Sq(1 + TMath::Sq(tubeSlope)) + TMath::Sq(start.z() - pPos.z());
+   Double_t r2 = TMath::Sq(tubeRadius);
+   if (dist2newCenter2 > r2) {
+      return false;
+   }
+   else return true;
+   //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1. / (start.x() - stop.x()));
+   //TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
+   //Double_t r = tubeRadius;
+   //wPos = wPos - TVector3(0,tubeshift,0);
+   //TVector3 dr = pPos - wPos;  
+   //Double_t theta = TMath::ATan((start.y() - stop.y()) / (start.x() - stop.x()));
+   //Double_t dz = pPos.z() - wPos.z();
+   //Double_t h = TMath::Sqrt(r * r - dz * dz) / TMath::Cos(theta);
+
+   //if ((h - (pPos.y() - wPos.y())) < tubeShift) {
+   //if (dr.Mag() > r) {
+      //       if (debug){ std::cout<<"OutOfTube"<<std::endl; }
+      //return false;
+   //}
+   //return true;
+}
+
 Double_t strawtubesDigi::FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID)
 {
-    // Approimate version, linearlized locally for the wire,
-    //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
-    TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
     Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
-    TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
-    //return dr.Mag();
-
-    Double_t slope = FindWireSlope(pPos.x(), start, stop, ID);
-    Double_t theta = TMath::ATan(slope);
-    Double_t ds = TMath::Sqrt(dr.x()*dr.x() + dr.y() * dr.y()) * cos(theta);
-    Double_t dz = dr.z();
-    Double_t result = TMath::Sqrt(ds*ds+dz*dz);
+    Double_t wireSlope = FindWireSlope(pPos.x(), start, stop, ID);
+    Double_t origWirePosition = stop.y() + ((start.y() - stop.y())/(start.x() - stop.x())) * (pPos.x() - stop.x());
+    Double_t newWirePosition = origWirePosition - wireShift;
+    Double_t dist2newWire2 = TMath::Sq(pPos.y() - newWirePosition) / TMath::Sq(1 + TMath::Sq(wireSlope)) + TMath::Sq(start.z() - pPos.z());
+    Double_t result = TMath::Sqrt(dist2newWire2);
 
     TVector3 pFromEnd = pPos - start;
     result = TMath::Min(result, pFromEnd.Mag());
     pFromEnd = pPos - stop;
     result = TMath::Min(result, pFromEnd.Mag());
     return result;
+
+    // Approimate version, linearlized locally for the wire,
+    //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    //TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
+    //Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
+    //TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
+    //return dr.Mag();
+
+    //Double_t slope = FindWireSlope(pPos.x(), start, stop, ID);
+    //Double_t theta = TMath::ATan(slope);
+    //Double_t ds = TMath::Sqrt(dr.x()*dr.x() + dr.y() * dr.y()) * cos(theta);
+    //Double_t dz = dr.z();
+    //Double_t result = TMath::Sqrt(ds*ds+dz*dz);
+
+    //TVector3 pFromEnd = pPos - start;
+    //result = TMath::Min(result, pFromEnd.Mag());
+    //pFromEnd = pPos - stop;
+    //result = TMath::Min(result, pFromEnd.Mag());
+    //return result;
 
     // Another method, by using TF1 to find inverse function and minimize
 }
@@ -343,18 +378,25 @@ Double_t strawtubesDigi::FindMisalignDist2Wire(strawtubesPoint* p)
     strawtubes* module = dynamic_cast<strawtubes*> (FairRunSim::Instance()->GetListOfModules()->FindObject("Strawtubes") );
     module->StrawEndPoints(ID,start,stop);
 
+    Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
+    Double_t wireSlope = FindWireSlope(pPos.x(), start, stop, ID);
+    Double_t origWirePosition = stop.y() + ((start.y() - stop.y())/(start.x() - stop.x())) * (pPos.x() - stop.x());
+    Double_t newWirePosition = origWirePosition - wireShift;
+    Double_t dist2newWire2 = TMath::Sq(pPos.y() - newWirePosition) / TMath::Sq(1 + TMath::Sq(wireSlope)) + TMath::Sq(start.z() - pPos.z());
+    Double_t result = TMath::Sqrt(dist2newWire2);
+
     // Approimate version
     //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
-    TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
-    Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
-    TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
+    //TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
+    //Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
+    //TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
     //return dr.Mag();
 
-    Double_t slope = FindWireSlope(pPos.x(), start, stop, ID);
-    Double_t theta = TMath::ATan(slope);
-    Double_t ds = TMath::Sqrt(dr.x()*dr.x() + dr.y() * dr.y()) * cos(theta);
-    Double_t dz = dr.z();
-    Double_t result = TMath::Sqrt(ds*ds+dz*dz);
+    //Double_t slope = FindWireSlope(pPos.x(), start, stop, ID);
+    //Double_t theta = TMath::ATan(slope);
+    //Double_t ds = TMath::Sqrt(dr.x()*dr.x() + dr.y() * dr.y()) * cos(theta);
+    //Double_t dz = dr.z();
+    //Double_t result = TMath::Sqrt(ds*ds+dz*dz);
 
     TVector3 pFromEnd = pPos - start;
     result = TMath::Min(result, pFromEnd.Mag());
@@ -368,9 +410,13 @@ Double_t strawtubesDigi::FindMisalignDist2Wire(strawtubesPoint* p)
 bool strawtubesDigi::InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Int_t ID)
 {
    //TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1. / (start.x() - stop.x()));
-   TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
+   //TVector3 wPos = (start - stop) + ((start - stop) * (pPos - stop)) * (start - stop) * (1./(start - stop).Mag2());
    Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
+   Double_t wireSlope = FindWireSlope(pPos.x(), start, stop, ID);
    Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), ID);
+   Double_t origWirePosition = stop.y() + ((start.y() - stop.y())/(start.x() - stop.x())) * (pPos.x() - stop.x());
+   Double_t newWirePosition = origWirePosition - wireShift;
+   TVector3 wPos(pPos.x() + (pPos.y() - newWirePosition)/(1 + TMath::Sq(wireSlope)), newWirePosition + wireSlope * (pPos.y() - newWirePosition)/(1 + TMath::Sq(wireSlope)), start.z());
    residualsInStraw->Fill(wPos.z() - pPos.z());
    if (wireShift <= tubeShift) // the wire is above the tube center, upper part is smaller part
    {

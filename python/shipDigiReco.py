@@ -740,7 +740,6 @@ class ShipDigiReco:
      self.digiStraw[index]=aHit
      if aHit.isValid():
       detID = aHit.GetDetectorID()
-      print("hitsPerDetId = {}", hitsPerDetId)
       if detID in hitsPerDetId:
        if self.digiStraw[hitsPerDetId[detID]].GetTDC() > aHit.GetTDC():
  # second hit with smaller tdc
@@ -899,8 +898,8 @@ class ShipDigiReco:
    if global_variables.withT0:  self.d2wireReco = self.withT0Estimate()
    # old procedure, not including estimation of t0
    else:       self.d2wireReco = self.strawHitReconstruction()
-   #counter = 0
-   for sm in self.d2wireReco:
+   counter = 0
+   for sm in self.prCollection:
     detID = self.digiStraw[sm['digiHit']].GetDetectorID()
     station = int(detID//10000000)
     trID = self.sTree.strawtubesPoint[sm['digiHit']].GetTrackID()
@@ -908,13 +907,13 @@ class ShipDigiReco:
       hitPosLists[trID]     = ROOT.std.vector('TVectorD')()
       listOfIndices[trID] = [] 
       stationCrossed[trID]  = {}
-    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],sm['dist']])
+    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist']])
     hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
 
     listOfIndices[trID].append(sm['digiHit'])
     if station not in stationCrossed[trID]: stationCrossed[trID][station]=0
     stationCrossed[trID][station]+=1
-    #counter += 1
+    counter += 1
 #
    # for atrack in listOfIndices:
    #   # make tracklets out of trackCandidates, just for testing, should be output of proper pattern recognition

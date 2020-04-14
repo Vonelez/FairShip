@@ -114,6 +114,7 @@ private:
     Double_t GetMaxTubeSagging(Int_t ID);
     Double_t GetMaxWireSagging(Int_t ID);
     Double_t FindWireSlope(Double_t x, TVector3 start, TVector3 stop, Int_t ID);
+    Double_t FindTubeSlope(Double_t x, TVector3 start, TVector3 stop, Int_t ID);
     Double_t CheckSagging(Int_t ID);
 
 };
