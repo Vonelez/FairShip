@@ -824,7 +824,7 @@ class ShipDigiReco:
          if driftTime < minimalDriftTime: driftTime = minimalDriftTime
          dist2wire = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
 
-     #if dist2wire > global_variables.ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+     if dist2wire > global_variables.ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
      if MCmode: dist2wire = p.dist2Wire()
 
@@ -887,8 +887,8 @@ class ShipDigiReco:
           hitPosLists[trID] = ROOT.std.vector('TVectorD')()
           listOfIndices[trID] = []
           stationCrossed[trID]  = {}
-        m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist']])
-        hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
+        m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist'],sm['detID']])
+        hitPosLists[trID].push_back(ROOT.TVectorD(len(m),m))
         listOfIndices[trID].append(sm['digiHit'])
         if station not in stationCrossed[trID]:
           stationCrossed[trID][station] = 0
@@ -907,8 +907,8 @@ class ShipDigiReco:
       hitPosLists[trID]     = ROOT.std.vector('TVectorD')()
       listOfIndices[trID] = [] 
       stationCrossed[trID]  = {}
-    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist']])
-    hitPosLists[trID].push_back(ROOT.TVectorD(7,m))
+    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist']],sm['detID'])
+    hitPosLists[trID].push_back(ROOT.TVectorD(len(m),m))
 
     listOfIndices[trID].append(sm['digiHit'])
     if station not in stationCrossed[trID]: stationCrossed[trID][station]=0
@@ -962,7 +962,10 @@ class ShipDigiReco:
       tp = ROOT.genfit.TrackPoint(theTrack) # note how the point is told which track it belongs to 
       measurement = ROOT.genfit.WireMeasurement(m,hitCov,1,6,tp) # the measurement is told which trackpoint it belongs to
       # print measurement.getMaxDistance()
-      measurement.setMaxDistance(global_variables.ShipGeo.strawtubes.InnerStrawDiameter / 2.)
+      if ROOT.strawtubesDigi.Instance().IsInitialized():
+        measurement.setMaxDistance(global_variables.ShipGeo.strawtubes.InnerStrawDiameter / 2.+abs(ROOT.strawtubesDigi.Instance().GetWireOffset(m[-1])))
+      else:
+        measurement.setMaxDistance(global_variables.ShipGeo.strawtubes.InnerStrawDiameter / 2.)
       # measurement.setLeftRightResolution(-1)
       tp.addRawMeasurement(measurement) # package measurement in the TrackPoint                                          
       theTrack.insertPoint(tp)  # add point to Track
