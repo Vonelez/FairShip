@@ -907,7 +907,7 @@ class ShipDigiReco:
       hitPosLists[trID]     = ROOT.std.vector('TVectorD')()
       listOfIndices[trID] = [] 
       stationCrossed[trID]  = {}
-    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist']],sm['detID'])
+    m = array('d',[sm['xtop'],sm['ytop'],sm['z'],sm['xbot'],sm['ybot'],sm['z'],self.d2wireReco[counter]['dist'],sm['detID']])
     hitPosLists[trID].push_back(ROOT.TVectorD(len(m),m))
 
     listOfIndices[trID].append(sm['digiHit'])
@@ -960,10 +960,10 @@ class ShipDigiReco:
     hitCov[6][6] = resolution*resolution
     for m in meas:
       tp = ROOT.genfit.TrackPoint(theTrack) # note how the point is told which track it belongs to 
-      measurement = ROOT.genfit.WireMeasurement(m,hitCov,1,6,tp) # the measurement is told which trackpoint it belongs to
+      measurement = ROOT.genfit.WireMeasurement(m.GetSub(0,6),hitCov,1,6,tp) # the measurement is told which trackpoint it belongs to
       # print measurement.getMaxDistance()
       if ROOT.strawtubesDigi.Instance().IsInitialized():
-        measurement.setMaxDistance(global_variables.ShipGeo.strawtubes.InnerStrawDiameter / 2.+abs(ROOT.strawtubesDigi.Instance().GetWireOffset(m[-1])))
+        measurement.setMaxDistance(global_variables.ShipGeo.strawtubes.InnerStrawDiameter / 2.+abs(ROOT.strawtubesDigi.Instance().GetWireOffset(int(m[7]))))
       else:
         measurement.setMaxDistance(global_variables.ShipGeo.strawtubes.InnerStrawDiameter / 2.)
       # measurement.setLeftRightResolution(-1)
