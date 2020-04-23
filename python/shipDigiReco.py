@@ -710,6 +710,7 @@ class ShipDigiReco:
            v.push_back(x)
        self.digiSBT2MC.push_back(v)
        index=index+1
+
  def digitizeStrawTubes(self):
  # digitize FairSHiP MC hits
    # from strawDigi_conf to initialize the part of module of misalignment
