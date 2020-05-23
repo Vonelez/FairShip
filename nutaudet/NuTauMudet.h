@@ -25,7 +25,6 @@ class NuTauMudet:public FairDetector
     void SetDesign(Int_t Design);
     void SetTotDimensions(Double_t X, Double_t Y, Double_t Z);
     void SetFeDimensions(Double_t X, Double_t Y, Double_t Z, Double_t Zthin=0.);
-    void SetRpcDimDifferences(Double_t deltax, Double_t deltay);
     void SetRpcDimensions(Double_t X, Double_t Y, Double_t Z);
     void SetRpcStripDimensions(Double_t X, Double_t Y, Double_t Z);
     void SetRpcGasDimensions(Double_t X, Double_t Y, Double_t Z);
@@ -33,7 +32,6 @@ class NuTauMudet:public FairDetector
     void SetRpcPETDimensions(Double_t X, Double_t Y, Double_t Z);
     void SetNFeInArm(Int_t N, Int_t Nthin= 0);
     void SetNRpcInArm(Int_t N);
-    void SetNRpcInTagger(Int_t NmuRpc); //for the veto tagger
     void SetZDimensionArm(Double_t Z);
     void SetGapDownstream(Double_t Gap);
     void SetGapMiddle(Double_t Gap);
@@ -41,9 +39,15 @@ class NuTauMudet:public FairDetector
     void SetReturnYokeDimensions(Double_t X, Double_t Y, Double_t Z);
     void SetSmallerYokeDimensions(Double_t X, Double_t Y, Double_t Z);
     void SetCoilParameters(Double_t CoilH, Double_t CoilW, Int_t N, Double_t CoilG);
-    void SetSupportTransverseDimensions(Double_t UpperSupportX, Double_t UpperSupportY, Double_t LowerSupportX, Double_t LowerSupportY, Double_t LateralSupportX, Double_t LateralSupportY);
+    void SetSupportTransverseDimensions(Double_t UpperSupportX, Double_t UpperSupportY, Double_t LowerSupportX, Double_t LowerSupportY, Double_t LateralSupportX, Double_t LateralSupportY, Double_t YSpacing);
     void SetLateralCutSize(Double_t CutHeight , Double_t CutLength); //lateral triangular cuts
     void SetPillarDimensions(Double_t X, Double_t Y, Double_t Z);
+    void SetUpperCoverDimensions(Double_t X, Double_t Y, Double_t Z);
+    void SetLateralCoverDimensions(Double_t X, Double_t Y, Double_t Z);
+    void SetCrossDimensions(Double_t X, Double_t Y, Double_t Z, Double_t WidthArm);
+    void SetRpcOuterDimensions(Double_t X, Double_t Y, Double_t Z);
+    void SetRpcInnerDimensions(Double_t X, Double_t Y, Double_t Z);
+    void SetRpcGapDimensions(Double_t X, Double_t Y, Double_t Z);
 
     void ConstructGeometry();
     
@@ -119,7 +123,7 @@ protected:
     Double_t fYtot;
     Double_t fZtot; //Dimension of the whole magnetic spectrometr (1st + 2nd arm + HPTs) alogn beam axis
     Int_t fNFe, fNFethin;
-    Int_t fNRpc, fNmuRpc;
+    Int_t fNRpc;
     Double_t fXFe;
     Double_t fXRpc;
     Double_t fYFe;
@@ -144,7 +148,6 @@ protected:
     Double_t fCoilW;
     Int_t fNCoil;
     
-    Double_t fdeltax, fdeltay; //different RPC transverse sizes
     //Dimension for detailed RPC simulation:
     Double_t fXStrip;
     Double_t fYStrip;
@@ -161,17 +164,44 @@ protected:
     Double_t fUpSuppX, fUpSuppY;//Dimensions of iron support structures
     Double_t fLowSuppX, fLowSuppY;
     Double_t fLatSuppX, fLatSuppY; //lateral supports
+    Double_t fYSpacing;
 
     Double_t fCutHeight, fCutLength; //Cut dimensions
     //Dimension of steel pillars
     Double_t fPillarX;
     Double_t fPillarY;
     Double_t fPillarZ;
+    //Dimension of upper cover on the RPC
+    Double_t fXCov;
+    Double_t fYCov;
+    Double_t fZCov;
+    //Dimension of lateral covers on RPC
+    Double_t fXLateral;
+    Double_t fYLateral;
+    Double_t fZLateral;
+    //Dimension of lateral crosses on RPC
+    Double_t fXCross;
+    Double_t fYCross;
+    Double_t fZCross;
+    Double_t fWidthArm;
+    //Dimension of outer frame of RPC
+    Double_t fXRpc_outer;
+    Double_t fYRpc_outer;
+    Double_t fZRpc_outer;
+    //Dimension of inner frame of RPC
+    Double_t fXRpc_inner;
+    Double_t fYRpc_inner;
+    Double_t fZRpc_inner;
+    //Dimension of gaps in RPC
+    Double_t fXRpcGap;
+    Double_t fYRpcGap;
+    Double_t fZRpcGap;
+
 
 
     NuTauMudet(const NuTauMudet&);
     NuTauMudet& operator=(const NuTauMudet&);
-    ClassDef(NuTauMudet,6)
+    ClassDef(NuTauMudet,8)
 
 };
 
