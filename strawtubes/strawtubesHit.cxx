@@ -51,6 +51,7 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
         flag = strawtubesDigi::Instance().CheckInTube(pPos,start,stop,fDetectorID);
         if (flag)
         {
+           //comment
            dist2Wire = strawtubesDigi::Instance().FindMisalignDist2Wire(pPos,start,stop,fDetectorID);
         }
      }
